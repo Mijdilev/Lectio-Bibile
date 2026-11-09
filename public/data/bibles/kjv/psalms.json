@@ -1,0 +1,231 @@
+{
+  "id": "PSA",
+  "slug": "psalms",
+  "name": "Psalms",
+  "translation": "kjv",
+  "chapters": {
+    "1": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "The Way of the Righteous and the Wicked"
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "Blessed is the man that walketh not in the counsel of the ungodly, nor standeth in the way of sinners, nor sitteth in the seat of the scornful."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 2,
+              "text": "But his delight is in the law of the LORD; and in his law doth he meditate day and night."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 3,
+              "text": "And he shall be like a tree planted by the rivers of water, that bringeth forth his fruit in his season; his leaf also shall not wither; and whatsoever he doeth shall prosper."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 4,
+              "text": "The ungodly are not so: but are like the chaff which the wind driveth away."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 5,
+              "text": "Therefore the ungodly shall not stand in the judgment, nor sinners in the congregation of the righteous."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 6,
+              "text": "For the LORD knoweth the way of the righteous: but the way of the ungodly shall perish."
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "blocks": [
+        {
+          "type": "d",
+          "heading": "A Psalm of David, when he fled from Absalom his son."
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "LORD, how are they increased that trouble me! many are they that rise up against me."
+            },
+            {
+              "n": 2,
+              "text": "Many there be which say of my soul, There is no help for him in God. Selah."
+            },
+            {
+              "n": 3,
+              "text": "But thou, O LORD, art a shield for me; my glory, and the lifter up of mine head."
+            },
+            {
+              "n": 4,
+              "text": "I cried unto the LORD with my voice, and he heard me out of his holy hill. Selah."
+            },
+            {
+              "n": 5,
+              "text": "I laid me down and slept; I awaked; for the LORD sustained me."
+            },
+            {
+              "n": 6,
+              "text": "I will not be afraid of ten thousands of people, that have set themselves against me round about."
+            },
+            {
+              "n": 7,
+              "text": "Arise, O LORD; save me, O my God: for thou hast smitten all mine enemies upon the cheek bone; thou hast broken the teeth of the ungodly."
+            },
+            {
+              "n": 8,
+              "text": "Salvation belongeth unto the LORD: thy blessing is upon thy people. Selah."
+            }
+          ]
+        }
+      ]
+    },
+    "9": {
+      "blocks": [
+        {
+          "type": "d",
+          "heading": "To the chief Musician upon Muthlabben, A Psalm of David."
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "I will praise thee, O LORD, with my whole heart; I will shew forth all thy marvellous works."
+            },
+            {
+              "n": 2,
+              "text": "I will be glad and rejoice in thee: I will sing praise to thy name, O thou most High."
+            },
+            {
+              "n": 3,
+              "text": "When mine enemies are turned back, they shall fall and perish at thy presence."
+            },
+            {
+              "n": 4,
+              "text": "For thou hast maintained my right and my cause; thou satest in the throne judging right."
+            }
+          ]
+        }
+      ]
+    },
+    "10": {
+      "blocks": [
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "Why standest thou afar off, O LORD? why hidest thou thyself in times of trouble?"
+            },
+            {
+              "n": 2,
+              "text": "The wicked in his pride doth persecute the poor: let them be taken in the devices that they have imagined."
+            },
+            {
+              "n": 3,
+              "text": "For the wicked boasteth of his heart's desire, and blesseth the covetous, whom the LORD abhorreth."
+            },
+            {
+              "n": 4,
+              "text": "The wicked, through the pride of his countenance, will not seek after God: God is not in all his thoughts."
+            }
+          ]
+        }
+      ]
+    },
+    "23": {
+      "blocks": [
+        {
+          "type": "d",
+          "heading": "A Psalm of David."
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "The LORD is my shepherd; I shall not want."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 2,
+              "text": "He maketh me to lie down in green pastures: he leadeth me beside the still waters."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 3,
+              "text": "He restoreth my soul: he leadeth me in the paths of righteousness for his name's sake."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 4,
+              "text": "Yea, though I walk through the valley of the shadow of death, I will fear no evil: for thou art with me; thy rod and thy staff they comfort me."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 5,
+              "text": "Thou preparest a table before me in the presence of mine enemies: thou anointest my head with oil; my cup runneth over."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 6,
+              "text": "Surely goodness and mercy shall follow me all the days of my life: and I will dwell in the house of the LORD for ever."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

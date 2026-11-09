@@ -1,0 +1,261 @@
+{
+  "id": "JHN",
+  "slug": "john",
+  "name": "John",
+  "translation": "kjv",
+  "chapters": {
+    "1": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "The Word became Flesh"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 1,
+              "text": "In the beginning was the Word, and the Word was with God, and the Word was God."
+            },
+            {
+              "n": 2,
+              "text": "The same was in the beginning with God."
+            },
+            {
+              "n": 3,
+              "text": "All things were made by him; and without him was not any thing made that was made."
+            },
+            {
+              "n": 4,
+              "text": "In him was life; and the life was the light of men."
+            },
+            {
+              "n": 5,
+              "text": "And the light shineth in darkness; and the darkness comprehended it not."
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 6,
+              "text": "There was a man sent from God, whose name was John."
+            },
+            {
+              "n": 7,
+              "text": "The same came for a witness, to bear witness of the Light, that all men through him might believe."
+            },
+            {
+              "n": 8,
+              "text": "He was not that Light, but was sent to bear witness of that Light."
+            },
+            {
+              "n": 9,
+              "text": "That was the true Light, which lighteth every man that cometh into the world."
+            },
+            {
+              "n": 10,
+              "text": "He was in the world, and the world was made by him, and the world knew him not."
+            },
+            {
+              "n": 11,
+              "text": "He came unto his own, and his own received him not."
+            },
+            {
+              "n": 12,
+              "text": "But as many as received him, to them gave he power to become the sons of God, even to them that believe on his name:"
+            },
+            {
+              "n": 13,
+              "text": "Which were born, not of blood, nor of the will of the flesh, nor of the will of man, but of God."
+            },
+            {
+              "n": 14,
+              "text": "And the Word was made flesh, and dwelt among us, (and we beheld his glory, the glory as of the only begotten of the Father,) full of grace and truth."
+            }
+          ]
+        },
+        {
+          "type": "s",
+          "heading": "The Witness of John"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 15,
+              "text": "John bare witness of him, and cried, saying, This was he of whom I spake, He that cometh after me is preferred before me: for he was before me."
+            },
+            {
+              "n": 16,
+              "text": "And of his fulness have all we received, and grace for grace."
+            },
+            {
+              "n": 17,
+              "text": "For the law was given by Moses, but grace and truth came by Jesus Christ."
+            },
+            {
+              "n": 18,
+              "text": "No man hath seen God at any time; the only begotten Son, which is in the bosom of the Father, he hath declared him."
+            }
+          ]
+        }
+      ]
+    },
+    "2": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "The Marriage in Cana"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 1,
+              "text": "And the third day there was a marriage in Cana of Galilee; and the mother of Jesus was there:"
+            },
+            {
+              "n": 2,
+              "text": "And both Jesus was called, and his disciples, to the marriage."
+            },
+            {
+              "n": 3,
+              "text": "And when they wanted wine, the mother of Jesus saith unto him, They have no wine."
+            },
+            {
+              "n": 4,
+              "text": "Jesus saith unto her, Woman, what have I to do with thee? mine hour is not yet come."
+            },
+            {
+              "n": 5,
+              "text": "His mother saith unto the servants, Whatsoever he saith unto you, do it."
+            },
+            {
+              "n": 6,
+              "text": "And there were set there six waterpots of stone, after the manner of the purifying of the Jews, containing two or three firkins apiece."
+            },
+            {
+              "n": 7,
+              "text": "Jesus saith unto them, Fill the waterpots with water. And they filled them up to the brim."
+            },
+            {
+              "n": 8,
+              "text": "And he saith unto them, Draw out now, and bear unto the governor of the feast. And they bare it."
+            },
+            {
+              "n": 9,
+              "text": "When the ruler of the feast had tasted the water that was made wine, and knew not whence it was: (but the servants which drew the water knew;) the governor of the feast called the bridegroom,"
+            },
+            {
+              "n": 10,
+              "text": "And saith unto him, Every man at the beginning doth set forth good wine; and when men have well drunk, then that which is worse: but thou hast kept the good wine until now."
+            },
+            {
+              "n": 11,
+              "text": "This beginning of miracles did Jesus in Cana of Galilee, and manifested forth his glory; and his disciples believed on him."
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "Nicodemus comes to Jesus"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 1,
+              "text": "There was a man of the Pharisees, named Nicodemus, a ruler of the Jews:"
+            },
+            {
+              "n": 2,
+              "text": "The same came to Jesus by night, and said unto him, Rabbi, we know that thou art a teacher come from God: for no man can do these miracles that thou doest, except God be with him."
+            },
+            {
+              "n": 3,
+              "text": "Jesus answered and said unto him, Verily, verily, I say unto thee, Except a man be born again, he cannot see the kingdom of God."
+            },
+            {
+              "n": 4,
+              "text": "Nicodemus saith unto him, How can a man be born when he is old? can he enter the second time into his mother's womb, and be born?"
+            },
+            {
+              "n": 5,
+              "text": "Jesus answered, Verily, verily, I say unto thee, Except a man be born of water and of the Spirit, he cannot enter into the kingdom of God."
+            },
+            {
+              "n": 6,
+              "text": "That which is born of the flesh is flesh; and that which is born of the Spirit is spirit."
+            },
+            {
+              "n": 7,
+              "text": "Marvel not that I said unto thee, Ye must be born again."
+            },
+            {
+              "n": 8,
+              "text": "The wind bloweth where it listeth, and thou hearest the sound thereof, but canst not tell whence it cometh, and whither it goeth: so is every one that is born of the Spirit."
+            },
+            {
+              "n": 9,
+              "text": "Nicodemus answered and said unto him, How can these things be?"
+            },
+            {
+              "n": 10,
+              "text": "Jesus answered and said unto him, Art thou a master of Israel, and knowest not these things?"
+            },
+            {
+              "n": 11,
+              "text": "Verily, verily, I say unto thee, We speak that we do know, and testify that we have seen; and ye receive not our witness."
+            },
+            {
+              "n": 12,
+              "text": "If I have told you earthly things, and ye believe not, how shall ye believe, if I tell you of heavenly things?"
+            },
+            {
+              "n": 13,
+              "text": "And no man hath ascended up to heaven, but he that came down from heaven, even the Son of man which is in heaven."
+            },
+            {
+              "n": 14,
+              "text": "And as Moses lifted up the serpent in the wilderness, even so must the Son of man be lifted up:"
+            },
+            {
+              "n": 15,
+              "text": "That whosoever believeth in him should not perish, but have eternal life."
+            },
+            {
+              "n": 16,
+              "text": "For God so loved the world, that he gave his only begotten Son, that whosoever believeth in him should not perish, but have everlasting life."
+            },
+            {
+              "n": 17,
+              "text": "For God sent not his Son into the world to condemn the world; but that the world through him might be saved."
+            },
+            {
+              "n": 18,
+              "text": "He that believeth on him is not condemned: but he that believeth not is condemned already, because he hath not believed in the name of the only begotten Son of God."
+            },
+            {
+              "n": 19,
+              "text": "And this is the condemnation, that light is come into the world, and men loved darkness rather than light, because their deeds were evil."
+            },
+            {
+              "n": 20,
+              "text": "For every one that doeth evil hateth the light, neither cometh to the light, lest his deeds should be reproved."
+            },
+            {
+              "n": 21,
+              "text": "But he that doeth truth cometh to the light, that his deeds may be made manifest, that they are wrought in God."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

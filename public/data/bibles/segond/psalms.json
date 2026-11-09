@@ -1,0 +1,212 @@
+{
+  "id": "PSA",
+  "slug": "psalms",
+  "name": "Psaumes",
+  "translation": "segond",
+  "chapters": {
+    "1": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "Les deux voies"
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "Heureux l'homme qui ne marche pas selon le conseil des méchants, qui ne s'arrête pas sur la voie des pécheurs, et qui ne s'assied pas en compagnie des moqueurs,"
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 2,
+              "text": "mais qui trouve son plaisir dans la loi de l'Éternel, et qui la médite jour et nuit!"
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 3,
+              "text": "Il est comme un arbre planté près d'un courant d'eau, qui donne son fruit en sa saison, et dont le feuillage ne se flétrit point: tout ce qu'il fait lui réussit."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 4,
+              "text": "Il n'en est pas ainsi des méchants: ils sont comme la paille que le vent dissipe."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 5,
+              "text": "C'est pourquoi les méchants ne résistent pas au jour du jugement, ni les pécheurs dans l'assemblée des justes;"
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 6,
+              "text": "car l'Éternel connaît la voie des justes, et la voie des pécheurs mène à la ruine."
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "blocks": [
+        {
+          "type": "d",
+          "heading": "Psaume de David. A l'occasion de sa fuite devant Absalom, son fils."
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "O Éternel, que mes ennemis sont nombreux! Quelle multitude se lève contre moi!"
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 2,
+              "text": "Combien qui disent à mon sujet: Plus de salut pour lui auprès de Dieu! — Pause."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 3,
+              "text": "Mais toi, ô Éternel! tu es mon bouclier, tu es ma gloire, et tu relèves ma tête."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 4,
+              "text": "De ma voix je crie à l'Éternel, et il me répond de sa montagne sainte. — Pause."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 5,
+              "text": "Je me couche, et je m'endors; je me réveille, car l'Éternel est mon soutien."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 6,
+              "text": "Je ne crains pas les myriades de peuples qui m'assiègent de toutes parts."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 7,
+              "text": "Lève-toi, Éternel! sauve-moi, mon Dieu! Car tu frappes à la joue tous mes ennemis, tu brises les dents des méchants."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 8,
+              "text": "Le salut est auprès de l'Éternel: que ta bénédiction soit sur ton peuple! — Pause."
+            }
+          ]
+        }
+      ]
+    },
+    "23": {
+      "blocks": [
+        {
+          "type": "d",
+          "heading": "Cantique de David."
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 1,
+              "text": "L'Éternel est mon berger: je ne manquerai de rien."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 2,
+              "text": "Il me fait reposer dans de verts pâturages, il me dirige près des eaux paisibles."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 3,
+              "text": "Il restaure mon âme, il me conduit dans les sentiers de la justice, à cause de son nom."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 4,
+              "text": "Quand je marche dans la vallée de l'ombre de la mort, je ne crains aucun mal, car tu es avec moi: ta houlette et ton bâton me rassurent."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 5,
+              "text": "Tu dresses devant moi une table, en face de mes adversaires; tu oins d'huile ma tête, et ma coupe déborde."
+            }
+          ]
+        },
+        {
+          "type": "q",
+          "verses": [
+            {
+              "n": 6,
+              "text": "Oui, le bonheur et la grâce m'accompagneront tous les jours de ma vie, et j'habiterai dans la maison de l'Éternel jusqu'à la fin de mes jours."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

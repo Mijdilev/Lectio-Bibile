@@ -1,0 +1,6 @@
+{
+  "name": "Lectio Bible Reader",
+  "description": "Minimalist, edge-to-edge multi-translation Bible reader with collapsible dock, parting split screen, and word highlights.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

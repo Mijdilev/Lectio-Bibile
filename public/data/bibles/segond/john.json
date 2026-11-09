@@ -1,0 +1,261 @@
+{
+  "id": "JHN",
+  "slug": "john",
+  "name": "Jean",
+  "translation": "segond",
+  "chapters": {
+    "1": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "La Parole faite chair"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 1,
+              "text": "Au commencement était la Parole, et la Parole était avec Dieu, et la Parole était Dieu."
+            },
+            {
+              "n": 2,
+              "text": "Elle était au commencement avec Dieu."
+            },
+            {
+              "n": 3,
+              "text": "Toutes choses ont été faites par elle, et rien de ce qui a été fait n'a été fait sans elle."
+            },
+            {
+              "n": 4,
+              "text": "En elle était la vie, et la vie était la lumière des hommes."
+            },
+            {
+              "n": 5,
+              "text": "La lumière luit dans les ténèbres, et les ténèbres ne l'ont point reçue."
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 6,
+              "text": "Il y eut un homme envoyé de Dieu: son nom était Jean."
+            },
+            {
+              "n": 7,
+              "text": "Il vint pour servir de témoin, pour rendre témoignage à la lumière, afin que tous crussent par lui."
+            },
+            {
+              "n": 8,
+              "text": "Il n'était pas la lumière, mais il parut pour rendre témoignage à la lumière."
+            },
+            {
+              "n": 9,
+              "text": "Cette lumière était la véritable lumière, qui, en venant dans le monde, éclaire tout homme."
+            },
+            {
+              "n": 10,
+              "text": "Elle était dans le monde, et le monde a été fait par elle, et le monde ne l'a point connue."
+            },
+            {
+              "n": 11,
+              "text": "Elle est venue chez les siens, et les siens ne l'ont point reçue."
+            },
+            {
+              "n": 12,
+              "text": "Mais à tous ceux qui l'ont reçue, à ceux qui croient en son nom, elle a donné le pouvoir de devenir enfants de Dieu,"
+            },
+            {
+              "n": 13,
+              "text": "lesquels sont nés, non du sang, ni de la volonté de la chair, ni de la volonté de l'homme, mais de Dieu."
+            },
+            {
+              "n": 14,
+              "text": "Et la parole a été faite chair, et elle a habité parmi nous, pleine de grâce et de vérité; et nous avons contemplé sa gloire, une gloire comme la gloire du Fils unique venu du Père."
+            }
+          ]
+        },
+        {
+          "type": "s",
+          "heading": "Le témoignage de Jean"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 15,
+              "text": "Jean lui a rendu témoignage, et s'est écrié: C'est celui dont j'ai dit: Celui qui vient après moi m'a précédé, car il était avant moi."
+            },
+            {
+              "n": 16,
+              "text": "Et nous avons tous reçu de sa plénitude, et grâce pour grâce;"
+            },
+            {
+              "n": 17,
+              "text": "car la loi a été donnée par Moïse, la grâce et la vérité sont venues par Jésus Christ."
+            },
+            {
+              "n": 18,
+              "text": "Personne n'a jamais vu Dieu; le Fils unique, qui est dans le sein du Père, est celui qui l'a fait connaître."
+            }
+          ]
+        }
+      ]
+    },
+    "2": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "Les noces de Cana"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 1,
+              "text": "Trois jours après, il y eut des noces à Cana en Galilée. La mère de Jésus était là,"
+            },
+            {
+              "n": 2,
+              "text": "et Jésus fut aussi invité aux noces avec ses disciples."
+            },
+            {
+              "n": 3,
+              "text": "Le vin ayant manqué, la mère de Jésus lui dit: Ils n'ont plus de vin."
+            },
+            {
+              "n": 4,
+              "text": "Jésus lui répondit: Femme, qu'y a-t-il entre moi et toi? Mon heure n'est pas encore venue."
+            },
+            {
+              "n": 5,
+              "text": "Sa mère dit aux serviteurs: Faites ce qu'il vous dira."
+            },
+            {
+              "n": 6,
+              "text": "Or, il y avait là six vases de pierre, destinés aux purifications des Juifs, et contenant chacun deux ou trois mesures."
+            },
+            {
+              "n": 7,
+              "text": "Jésus leur dit: Remplissez d'eau ces vases. Et ils les remplirent jusqu'au bord."
+            },
+            {
+              "n": 8,
+              "text": "Puisez maintenant, leur dit-il, et portez-en à l'ordonnateur du repas. Et ils en portèrent."
+            },
+            {
+              "n": 9,
+              "text": "Quand l'ordonnateur du repas eut goûté l'eau changée en vin, ne sachant d'où venait ce vin, tandis que les serviteurs, qui avaient puisé l'eau, le savaient bien, il appela l'époux,"
+            },
+            {
+              "n": 10,
+              "text": "et lui dit: Tout homme sert d'abord le bon vin, puis le moins bon après qu'on s'est enivré; toi, tu as gardé le bon vin jusqu'à présent."
+            },
+            {
+              "n": 11,
+              "text": "Tel fut, à Cana en Galilée, le premier des miracles que fit Jésus. Il manifesta sa gloire, et ses disciples crurent en lui."
+            }
+          ]
+        }
+      ]
+    },
+    "3": {
+      "blocks": [
+        {
+          "type": "s",
+          "heading": "Entretien avec Nicodème"
+        },
+        {
+          "type": "p",
+          "verses": [
+            {
+              "n": 1,
+              "text": "Mais il y eut un homme d'entre les pharisiens, nommé Nicodème, un chef des Juifs,"
+            },
+            {
+              "n": 2,
+              "text": "qui vint, lui, auprès de Jésus, de nuit, et lui dit: Rabbi, nous savons que tu es un docteur venu de Dieu; car personne ne peut faire ces miracles que tu fais, si Dieu n'est avec lui."
+            },
+            {
+              "n": 3,
+              "text": "Jésus lui répondit: En vérité, en vérité, je te le dis, si un homme ne naît de nouveau, il ne peut voir le royaume de Dieu."
+            },
+            {
+              "n": 4,
+              "text": "Nicodème lui dit: Comment un homme peut-il naître quand il est vieux? Peut-il rentrer dans le sein de sa mère et naître?"
+            },
+            {
+              "n": 5,
+              "text": "Jésus répondit: En vérité, en vérité, je te le dis, si un homme ne naît d'eau et d'Esprit, il ne peut entrer dans le royaume de Dieu."
+            },
+            {
+              "n": 6,
+              "text": "Ce qui est né de la chair est chair, et ce qui est né de l'Esprit est esprit."
+            },
+            {
+              "n": 7,
+              "text": "Ne t'étonne pas que je t'aie dit: Il faut que vous naissiez de nouveau."
+            },
+            {
+              "n": 8,
+              "text": "Le vent souffle où il veut, et tu en entends le bruit; mais tu ne sais d'où il vient, ni où il va. Il en est ainsi de tout homme qui est né de l'Esprit."
+            },
+            {
+              "n": 9,
+              "text": "Nicodème lui dit: Comment cela peut-il se faire?"
+            },
+            {
+              "n": 10,
+              "text": "Jésus lui répondit: Tu es le docteur d'Israël, et tu ne sais pas ces choses!"
+            },
+            {
+              "n": 11,
+              "text": "En vérité, en vérité, je te le dis, nous disons ce que nous savons, et nous rendons témoignage de ce que nous avons vu; et vous ne recevez pas notre témoignage."
+            },
+            {
+              "n": 12,
+              "text": "Si vous ne croyez pas quand je vous ai parlé des choses terrestres, comment croirez-vous quand je vous parlerai des choses célestes?"
+            },
+            {
+              "n": 13,
+              "text": "Personne n'est monté au ciel, si ce n'est celui qui est descendu du ciel, le Fils de l'homme qui est dans le ciel."
+            },
+            {
+              "n": 14,
+              "text": "Et comme Moïse éleva le serpent dans le désert, il faut de même que le Fils de l'homme soit élevé,"
+            },
+            {
+              "n": 15,
+              "text": "afin que quiconque croit en lui ait la vie éternelle."
+            },
+            {
+              "n": 16,
+              "text": "Car Dieu a tant aimé le monde qu'il a donné son Fils unique, afin que quiconque croit en lui ne périsse point, mais qu'il ait la vie éternelle."
+            },
+            {
+              "n": 17,
+              "text": "Dieu, en effet, n'a pas envoyé son Fils dans le monde pour qu'il juge le monde, mais pour que le monde soit sauvé par lui."
+            },
+            {
+              "n": 18,
+              "text": "Celui qui croit en lui n'est point jugé; mais celui qui ne croit pas est déjà jugé, parce qu'il n'a pas cru au nom du Fils unique de Dieu."
+            },
+            {
+              "n": 19,
+              "text": "Et ce jugement c'est que, la lumière étant venue dans le monde, les hommes ont préféré les ténèbres à la lumière, parce que leurs œuvres étaient mauvaises."
+            },
+            {
+              "n": 20,
+              "text": "Car quiconque fait le mal hait la lumière, et ne vient point à la lumière, de peur que ses œuvres ne soient dévoilées;"
+            },
+            {
+              "n": 21,
+              "text": "mais celui qui agit selon la vérité vient à la lumière, afin que ses œuvres soient manifestées, parce qu'elles sont faites en Dieu."
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

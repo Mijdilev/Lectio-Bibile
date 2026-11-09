@@ -1,0 +1,783 @@
+/* Lectio Bible Reader Stylesheet
+   Pure CSS - No UI kits, No Tailwind classes
+   Implements flat White and Black AMOLED themes, edge-to-edge typography,
+   collapsible pill dock, and parting split gestures. */
+
+:root {
+  --bg: #ffffff;
+  --text: #000000;
+  --text-muted: #666666;
+  --text-subtle: #8e8e93;
+  --dock-bg: #ffffff;
+  --dock-border: #000000;
+  --dock-text: #000000;
+  --divider: #e5e5ea;
+  --sheet-bg: #ffffff;
+  --highlight-color: #000000;
+  --font-serif: 'Literata', 'Source Serif 4', Georgia, serif;
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --phone-width: 38rem;
+  --dock-open-height: 44px;
+  --dock-collapsed-height: 28px;
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+}
+
+[data-theme='black'] {
+  --bg: #000000;
+  --text: #ffffff;
+  --text-muted: #999999;
+  --text-subtle: #636366;
+  --dock-bg: #000000;
+  --dock-border: #ffffff;
+  --dock-text: #ffffff;
+  --divider: #2c2c2e;
+  --sheet-bg: #000000;
+  --highlight-color: #ffffff;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #root {
+  width: 100%;
+  height: 100%;
+  min-height: 100dvh;
+  background-color: var(--bg);
+  color: var(--text);
+  font-family: var(--font-serif);
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Edge-to-edge app wrapper */
+.lectio-root {
+  width: 100%;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--bg);
+  color: var(--text);
+  position: relative;
+  overflow: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* The phone-shaped reading frame (centered on wide displays) */
+.lectio-frame {
+  width: 100%;
+  max-width: var(--phone-width);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--bg);
+  overflow: hidden;
+}
+
+/* Status-bar simulation for desktop/browser, transparent and non-blocking */
+.status-bar-band {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: max(22px, var(--sat));
+  pointer-events: none;
+  z-index: 20;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  color: var(--text-muted);
+  opacity: 0.6;
+}
+
+/* Reading viewport */
+.reading-viewport {
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Single Pane View */
+.pane-single {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1.25rem;
+  /* Scripture runs through the top edge of the screen */
+  padding-top: max(2rem, calc(var(--sat) + 1.25rem));
+  /* Bottom padding so text scrolls well past the floating dock */
+  padding-bottom: calc(var(--sab) + 5.5rem);
+}
+
+/* Split Panes Container */
+.split-container {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.pane-primary {
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1.25rem;
+  padding-top: max(2rem, calc(var(--sat) + 1.25rem));
+  padding-bottom: 2.5rem;
+  position: relative;
+}
+
+.pane-comparison {
+  width: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 1.25rem;
+  padding-top: 1.25rem;
+  padding-bottom: calc(var(--sab) + 5.5rem);
+  position: relative;
+}
+
+/* Split Divider */
+.split-divider {
+  width: 100%;
+  height: 14px;
+  margin: -7px 0;
+  z-index: 15;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: row-resize;
+  position: relative;
+  touch-action: none;
+}
+
+.split-divider-line {
+  width: 100%;
+  height: 1px;
+  background-color: var(--divider);
+  position: relative;
+}
+
+.split-divider-handle {
+  width: 32px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--text-subtle);
+  position: absolute;
+  top: 5px;
+}
+
+/* Synchronized scroll zone on right side (as drawn in the 3rd sketch) */
+.dual-scroll-drag-zone {
+  position: absolute;
+  right: 0;
+  top: 35%;
+  bottom: 25%;
+  width: 36px;
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  touch-action: none;
+  cursor: ns-resize;
+}
+
+.dual-scroll-tab {
+  width: 14px;
+  height: 72px;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+  border: 1px solid var(--dock-border);
+  border-right: none;
+  background-color: var(--dock-bg);
+  opacity: 0.35;
+  transition: opacity 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dual-scroll-drag-zone:hover .dual-scroll-tab,
+.dual-scroll-drag-zone:active .dual-scroll-tab {
+  opacity: 0.85;
+}
+
+/* Middle gesture parting line (Sketch 2) */
+.middle-drag-hitbox {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 45%;
+  height: 60px;
+  z-index: 12;
+  cursor: ew-resize;
+  touch-action: pan-y;
+  display: flex;
+  align-items: center;
+}
+
+.middle-drag-crease {
+  position: absolute;
+  left: 0;
+  height: 2px;
+  background: var(--text);
+  border-radius: 1px;
+  opacity: 0.7;
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+.middle-drag-wave {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+/* Scripture Blocks & Typography */
+.scripture-prose {
+  margin-bottom: 1.15rem;
+  line-height: 1.75;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.scripture-poetry {
+  margin-bottom: 0.4rem;
+  padding-left: 1.5rem;
+  text-indent: -1.5rem;
+  line-height: 1.65;
+  user-select: text;
+  -webkit-user-select: text;
+}
+
+.section-heading {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 1.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  user-select: none;
+}
+
+.superscription {
+  font-style: italic;
+  font-size: 0.9em;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+  user-select: none;
+}
+
+/* Small, subtle verse number */
+.verse-num {
+  font-family: var(--font-sans);
+  font-size: 0.65em;
+  font-weight: 500;
+  vertical-align: super;
+  line-height: 0;
+  margin-right: 0.28em;
+  margin-left: 0.15em;
+  opacity: 0.45;
+  user-select: none;
+}
+
+/* Word and Phrase Highlights: thin underline, black on white and white on black */
+.word-highlight {
+  border-bottom: 1.5px solid var(--highlight-color);
+  padding-bottom: 1px;
+  cursor: pointer;
+  background: transparent;
+  display: inline;
+}
+
+/* Highlight Action Popup */
+.highlight-action-popup {
+  position: fixed;
+  z-index: 100;
+  background-color: var(--dock-bg);
+  border: 1px solid var(--dock-border);
+  border-radius: 8px;
+  padding: 4px 8px;
+  display: flex;
+  gap: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  color: var(--dock-text);
+  transform: translate(-50%, -100%);
+  margin-top: -8px;
+}
+
+.highlight-action-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: inherit;
+  cursor: pointer;
+  padding: 2px 4px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Floating Bottom Dock Container */
+.bottom-dock-container {
+  position: absolute;
+  bottom: calc(var(--sab) + 0.85rem);
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* Base Pill Button */
+.dock-pill {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--dock-bg);
+  color: var(--dock-text);
+  border: 1px solid var(--dock-border);
+  border-radius: 9999px;
+  font-family: var(--font-sans);
+  user-select: none;
+  touch-action: manipulation;
+  cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  transition: height 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.2s ease,
+              transform 0.15s ease;
+}
+
+.dock-pill:active {
+  transform: scale(0.97);
+}
+
+/* Pill - Open State */
+.dock-pill-open {
+  height: var(--dock-open-height);
+  padding: 0 0.95rem;
+  min-width: 160px;
+}
+
+/* Pill - Collapsed State (about half height, gear hidden) */
+.dock-pill-collapsed {
+  height: var(--dock-collapsed-height);
+  padding: 0 0.8rem;
+  min-width: 110px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dock-pill-place {
+  font-size: 0.85rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.dock-pill-collapsed .dock-pill-place {
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.dock-pill-gear {
+  background: none;
+  border: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 0.75rem;
+  cursor: pointer;
+  padding: 4px;
+  opacity: 1;
+  transition: opacity 0.15s ease, transform 0.2s ease;
+}
+
+.dock-pill-gear:active {
+  transform: rotate(45deg);
+}
+
+.dock-pill-collapsed .dock-pill-gear {
+  opacity: 0;
+  pointer-events: none;
+  display: none;
+}
+
+/* Split Pill Variant (Two pills side by side in split mode) */
+.dock-pill-split {
+  height: 36px;
+  padding: 0 0.75rem;
+  min-width: 100px;
+}
+
+.dock-pill-split .dock-pill-place {
+  font-size: 0.78rem;
+}
+
+.dock-pill-lang-badge {
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  opacity: 0.6;
+  margin-left: 0.35rem;
+  padding: 1px 3px;
+  border-radius: 3px;
+  border: 1px solid currentColor;
+}
+
+/* Sheets (BookPicker & GearSheet) */
+.sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  z-index: 50;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.sheet-card {
+  width: 100%;
+  max-width: var(--phone-width);
+  max-height: 85dvh;
+  background-color: var(--sheet-bg);
+  color: var(--text);
+  border-top: 1px solid var(--divider);
+  border-top-left-radius: 16px;
+  border-top-right-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.15);
+  animation: slideUp 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  padding-bottom: max(1rem, var(--sab));
+}
+
+.sheet-header {
+  padding: 1rem 1.25rem 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--divider);
+}
+
+.sheet-title {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.sheet-close-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sheet-body {
+  overflow-y: auto;
+  padding: 1rem 1.25rem;
+  flex: 1;
+}
+
+/* BookPicker Layout */
+.testament-tab-bar {
+  display: flex;
+  border-bottom: 1px solid var(--divider);
+  margin-bottom: 1rem;
+}
+
+.testament-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 0.6rem 0;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.testament-tab.active {
+  color: var(--text);
+  border-bottom-color: var(--text);
+}
+
+.books-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.book-btn {
+  background: none;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+  cursor: pointer;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.book-btn:hover, .book-btn.active {
+  border-color: var(--text);
+  background-color: var(--divider);
+}
+
+.chapters-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(44px, 1fr));
+  gap: 0.4rem;
+  margin-top: 0.5rem;
+}
+
+.chapter-btn {
+  aspect-ratio: 1;
+  background: none;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 0.15s;
+}
+
+.chapter-btn:hover, .chapter-btn.active {
+  border-color: var(--text);
+  background-color: var(--text);
+  color: var(--bg);
+}
+
+/* Gear Sheet Options */
+.gear-section {
+  margin-bottom: 1.5rem;
+}
+
+.gear-section-label {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--text-muted);
+  margin-bottom: 0.6rem;
+}
+
+.gear-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.gear-toggle-btn {
+  flex: 1;
+  background: none;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  padding: 0.65rem 0.5rem;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  transition: all 0.15s;
+}
+
+.gear-toggle-btn.active {
+  border-color: var(--text);
+  background-color: var(--text);
+  color: var(--bg);
+}
+
+.font-size-stepper {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  padding: 0.4rem 0.75rem;
+}
+
+.stepper-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0.2rem 0.6rem;
+}
+
+.saved-phrases-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.saved-phrase-item {
+  border: 1px solid var(--divider);
+  border-radius: 6px;
+  padding: 0.6rem 0.75rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+
+.saved-phrase-item:hover {
+  border-color: var(--text);
+}
+
+.saved-phrase-text {
+  font-style: italic;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  flex: 1;
+}
+
+.saved-phrase-ref {
+  font-family: var(--font-sans);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  white-space: nowrap;
+}
+
+.saved-phrase-delete {
+  background: none;
+  border: none;
+  color: var(--text-subtle);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 0.8rem;
+}
+
+.saved-phrase-delete:hover {
+  color: var(--text);
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+/* Chapter transition animation: short directional fade and rise ~280ms */
+.chapter-enter {
+  animation: chapterRise 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes chapterRise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* prefers-reduced-motion: swap state immediately */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Scrollbar styling: minimal & unobtrusive */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--divider);
+  border-radius: 2px;
+}
