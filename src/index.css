@@ -14,6 +14,30 @@
   --divider: #e5e5ea;
   --sheet-bg: #ffffff;
   --highlight-color: #000000;
+  --highlighter-bg: rgba(254, 240, 138, 0.75);
+  --selection-bg: rgba(0, 0, 0, 0.09);
+
+  /* Color Palette - Light */
+  --hl-monochrome-stroke: #000000;
+  --hl-monochrome-fill: rgba(0, 0, 0, 0.08);
+  --hl-monochrome-dot: #111111;
+
+  --hl-amber-stroke: #d97706;
+  --hl-amber-fill: rgba(251, 191, 36, 0.35);
+  --hl-amber-dot: #f59e0b;
+
+  --hl-sage-stroke: #059669;
+  --hl-sage-fill: rgba(52, 211, 153, 0.30);
+  --hl-sage-dot: #10b981;
+
+  --hl-rose-stroke: #e11d48;
+  --hl-rose-fill: rgba(251, 113, 133, 0.30);
+  --hl-rose-dot: #f43f5e;
+
+  --hl-azure-stroke: #0284c7;
+  --hl-azure-fill: rgba(56, 189, 248, 0.30);
+  --hl-azure-dot: #0ea5e9;
+
   --font-serif: 'Literata', 'Source Serif 4', Georgia, serif;
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   --phone-width: 38rem;
@@ -34,6 +58,29 @@
   --divider: #2c2c2e;
   --sheet-bg: #000000;
   --highlight-color: #ffffff;
+  --highlighter-bg: rgba(234, 179, 8, 0.38);
+  --selection-bg: rgba(255, 255, 255, 0.18);
+
+  /* Color Palette - AMOLED Black */
+  --hl-monochrome-stroke: #ffffff;
+  --hl-monochrome-fill: rgba(255, 255, 255, 0.20);
+  --hl-monochrome-dot: #ffffff;
+
+  --hl-amber-stroke: #fbbf24;
+  --hl-amber-fill: rgba(245, 158, 11, 0.30);
+  --hl-amber-dot: #fbbf24;
+
+  --hl-sage-stroke: #34d399;
+  --hl-sage-fill: rgba(16, 185, 129, 0.30);
+  --hl-sage-dot: #34d399;
+
+  --hl-rose-stroke: #fb7185;
+  --hl-rose-fill: rgba(244, 63, 94, 0.30);
+  --hl-rose-dot: #fb7185;
+
+  --hl-azure-stroke: #38bdf8;
+  --hl-azure-fill: rgba(14, 165, 233, 0.30);
+  --hl-azure-dot: #38bdf8;
 }
 
 * {
@@ -119,8 +166,11 @@ html, body, #root {
   height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  contain: content;
   padding: 0 1.25rem;
   /* Scripture runs through the top edge of the screen */
   padding-top: max(2rem, calc(var(--sat) + 1.25rem));
@@ -136,14 +186,18 @@ html, body, #root {
   flex-direction: column;
   position: relative;
   overflow: hidden;
+  contain: strict;
 }
 
 .pane-primary {
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  contain: content;
   padding: 0 1.25rem;
   padding-top: max(2rem, calc(var(--sat) + 1.25rem));
   padding-bottom: 2.5rem;
@@ -154,8 +208,11 @@ html, body, #root {
   width: 100%;
   overflow-y: auto;
   overflow-x: hidden;
-  scroll-behavior: smooth;
+  scroll-behavior: auto;
+  touch-action: pan-y;
+  overscroll-behavior-y: contain;
   -webkit-overflow-scrolling: touch;
+  contain: content;
   padding: 0 1.25rem;
   padding-top: 1.25rem;
   padding-bottom: calc(var(--sab) + 5.5rem);
@@ -192,74 +249,20 @@ html, body, #root {
   top: 5px;
 }
 
-/* Synchronized scroll zone on right side (as drawn in the 3rd sketch) */
-.dual-scroll-drag-zone {
+/* Reserved half of bottom part for scrolling two translations simultaneously (invisible, large one-handed thumb zone) */
+.dual-scroll-half-zone {
   position: absolute;
   right: 0;
-  top: 35%;
-  bottom: 25%;
-  width: 36px;
-  z-index: 25;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
+  top: 0;
+  bottom: 0;
+  width: 50%;
+  z-index: 10;
   touch-action: none;
+  background: transparent;
   cursor: ns-resize;
-}
-
-.dual-scroll-tab {
-  width: 14px;
-  height: 72px;
-  border-top-left-radius: 8px;
-  border-bottom-left-radius: 8px;
-  border: 1px solid var(--dock-border);
-  border-right: none;
-  background-color: var(--dock-bg);
-  opacity: 0.35;
-  transition: opacity 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dual-scroll-drag-zone:hover .dual-scroll-tab,
-.dual-scroll-drag-zone:active .dual-scroll-tab {
-  opacity: 0.85;
-}
-
-/* Middle gesture parting line (Sketch 2) */
-.middle-drag-hitbox {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 45%;
-  height: 60px;
-  z-index: 12;
-  cursor: ew-resize;
-  touch-action: pan-y;
-  display: flex;
-  align-items: center;
-}
-
-.middle-drag-crease {
-  position: absolute;
-  left: 0;
-  height: 2px;
-  background: var(--text);
-  border-radius: 1px;
-  opacity: 0.7;
-  pointer-events: none;
-  transition: width 0.05s linear;
-}
-
-.middle-drag-wave {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 0;
-  pointer-events: none;
-  overflow: visible;
+  user-select: none;
+  -webkit-user-select: none;
+  will-change: transform;
 }
 
 /* Scripture Blocks & Typography */
@@ -317,43 +320,244 @@ html, body, #root {
   user-select: none;
 }
 
-/* Word and Phrase Highlights: thin underline, black on white and white on black */
+/* Word and Phrase Highlights */
 .word-highlight {
-  border-bottom: 1.5px solid var(--highlight-color);
-  padding-bottom: 1px;
+  --hl-stroke: var(--hl-monochrome-stroke);
+  --hl-fill: var(--hl-monochrome-fill);
   cursor: pointer;
-  background: transparent;
   display: inline;
+  transition: opacity 0.15s ease;
+}
+
+/* Color Palette Variants */
+.word-highlight.color-monochrome {
+  --hl-stroke: var(--hl-monochrome-stroke);
+  --hl-fill: var(--hl-monochrome-fill);
+}
+.word-highlight.color-amber {
+  --hl-stroke: var(--hl-amber-stroke);
+  --hl-fill: var(--hl-amber-fill);
+}
+.word-highlight.color-sage {
+  --hl-stroke: var(--hl-sage-stroke);
+  --hl-fill: var(--hl-sage-fill);
+}
+.word-highlight.color-rose {
+  --hl-stroke: var(--hl-rose-stroke);
+  --hl-fill: var(--hl-rose-fill);
+}
+.word-highlight.color-azure {
+  --hl-stroke: var(--hl-azure-stroke);
+  --hl-fill: var(--hl-azure-fill);
+}
+
+/* Style Variants */
+/* 1. Pencil: Fine monochrome or colored pen underline */
+.word-highlight.style-pencil,
+.word-highlight:not(.style-highlighter):not(.style-wavy):not(.style-double) {
+  border-bottom: 1.5px solid var(--hl-stroke);
+  padding-bottom: 1px;
+}
+
+/* 2. Highlighter: Translucent marker wash fill */
+.word-highlight.style-highlighter {
+  background-color: var(--hl-fill);
+  border-radius: 2px;
+  padding: 1px 3px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* 3. Wavy Ink: Expressive hand-drawn brush squiggle underline */
+.word-highlight.style-wavy {
+  text-decoration: underline wavy var(--hl-stroke);
+  text-underline-offset: 3.5px;
+  text-decoration-thickness: 1.5px;
+}
+
+/* 4. Double Pen: Refined double ruling */
+.word-highlight.style-double {
+  text-decoration: underline double var(--hl-stroke);
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+
+.word-highlight:hover {
+  opacity: 0.85;
+}
+
+/* Interactive scripture word elements for tap and drag selection */
+.scripture-word {
+  display: inline;
+  border-radius: 2px;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: pan-y;
+  cursor: pointer;
+  padding: 1px 0;
+  transition: background-color 0.08s ease;
+}
+
+.scripture-word.word-selected {
+  background-color: var(--selection-bg);
+  border-radius: 2px;
+  box-shadow: 0 0 0 1px var(--selection-bg);
 }
 
 /* Highlight Action Popup */
 .highlight-action-popup {
   position: fixed;
-  z-index: 100;
+  z-index: 10000;
   background-color: var(--dock-bg);
   border: 1px solid var(--dock-border);
-  border-radius: 8px;
-  padding: 4px 8px;
+  border-radius: 16px;
+  padding: 8px 12px;
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
   font-family: var(--font-sans);
-  font-size: 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 500;
   color: var(--dock-text);
-  transform: translate(-50%, -100%);
-  margin-top: -8px;
+  pointer-events: auto;
+  user-select: none;
+  -webkit-user-select: none;
+  animation: popupFadeIn 0.15s ease-out;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  max-width: 95vw;
+}
+
+.popup-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.popup-color-palette {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--divider);
+}
+
+.palette-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  opacity: 0.6;
+  margin-right: 2px;
+}
+
+.color-dot-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.12s ease, border-color 0.12s ease;
+}
+
+.color-dot-btn:hover {
+  transform: scale(1.15);
+}
+
+.color-dot-btn.active {
+  border-color: var(--dock-text);
+  transform: scale(1.1);
+}
+
+.color-dot-inner {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='black'] .color-dot-inner {
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.popup-styles-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.style-selector-btn {
+  background: none;
+  border: 1px solid transparent;
+  color: inherit;
+  font-family: inherit;
+  font-size: 0.74rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+  border-radius: 6px;
+  transition: background-color 0.12s ease, color 0.12s ease, border-color 0.12s ease;
+}
+
+.style-selector-btn:hover {
+  background-color: var(--divider);
+}
+
+.style-selector-btn.active {
+  background-color: var(--dock-text);
+  color: var(--dock-bg);
+  border-color: var(--dock-text);
 }
 
 .highlight-action-btn {
   background: none;
   border: none;
   color: inherit;
+  font-family: inherit;
   font-size: inherit;
+  font-weight: 600;
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 3px 6px;
   display: flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap;
+  border-radius: 6px;
+}
+
+.highlight-action-btn:hover {
+  opacity: 0.7;
+}
+
+.highlight-action-btn:active {
+  transform: scale(0.96);
+}
+
+.highlight-popup-divider {
+  opacity: 0.3;
+  margin: 0 1px;
+}
+
+@keyframes popupFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -85%) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%) scale(1);
+  }
 }
 
 /* Floating Bottom Dock Container */
@@ -425,6 +629,40 @@ html, body, #root {
   font-weight: 500;
 }
 
+.dock-pill-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 0.6rem;
+}
+
+.dock-pill-btn {
+  background: none;
+  border: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 9999px;
+  opacity: 0.85;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  touch-action: manipulation;
+}
+
+.dock-pill-btn:hover {
+  opacity: 1;
+}
+
+.dock-pill-btn:active {
+  transform: scale(0.9);
+}
+
+.dock-pill-btn.active {
+  opacity: 1;
+}
+
 .dock-pill-gear {
   background: none;
   border: none;
@@ -443,10 +681,22 @@ html, body, #root {
   transform: rotate(45deg);
 }
 
-.dock-pill-collapsed .dock-pill-gear {
+.dock-pill-collapsed .dock-pill-gear,
+.dock-pill-collapsed .dock-pill-actions {
   opacity: 0;
   pointer-events: none;
   display: none;
+}
+
+/* 90Hz / 120Hz ProMotion Hardware Compositing */
+.pane-single,
+.pane-primary,
+.pane-comparison {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  will-change: scroll-position;
 }
 
 /* Split Pill Variant (Two pills side by side in split mode) */

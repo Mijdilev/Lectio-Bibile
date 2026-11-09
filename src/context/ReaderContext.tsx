@@ -40,6 +40,7 @@ interface ReaderContextType {
   highlights: HighlightItem[];
   addHighlight: (item: Omit<HighlightItem, 'id' | 'createdAt'>) => void;
   removeHighlight: (id: string) => void;
+  updateHighlight: (id: string, updates: Partial<HighlightItem>) => void;
 
   // Synchronized scroll trigger
   syncScrollDelta: number;
@@ -220,11 +221,31 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   }, []);
 
   const setPrimaryPlace = useCallback((place: Partial<PlaceReference>) => {
-    setPrimaryPlaceState(prev => ({ ...prev, ...place }));
+    setPrimaryPlaceState(prev => {
+      if (
+        (place.verse === undefined || place.verse === prev.verse) &&
+        (place.chapter === undefined || place.chapter === prev.chapter) &&
+        (place.book === undefined || place.book === prev.book) &&
+        (place.translation === undefined || place.translation === prev.translation)
+      ) {
+        return prev;
+      }
+      return { ...prev, ...place };
+    });
   }, []);
 
   const setComparisonPlace = useCallback((place: Partial<PlaceReference>) => {
-    setComparisonPlaceState(prev => ({ ...prev, ...place }));
+    setComparisonPlaceState(prev => {
+      if (
+        (place.verse === undefined || place.verse === prev.verse) &&
+        (place.chapter === undefined || place.chapter === prev.chapter) &&
+        (place.book === undefined || place.book === prev.book) &&
+        (place.translation === undefined || place.translation === prev.translation)
+      ) {
+        return prev;
+      }
+      return { ...prev, ...place };
+    });
   }, []);
 
   const addHighlight = useCallback((item: Omit<HighlightItem, 'id' | 'createdAt'>) => {
@@ -240,8 +261,12 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     setHighlights(prev => prev.filter(h => h.id !== id));
   }, []);
 
+  const updateHighlight = useCallback((id: string, updates: Partial<HighlightItem>) => {
+    setHighlights(prev => prev.map(h => (h.id === id ? { ...h, ...updates } : h)));
+  }, []);
+
   const triggerSyncScroll = useCallback((deltaY: number) => {
-    setSyncScrollDelta(deltaY);
+    window.dispatchEvent(new CustomEvent('lectio:sync-scroll', { detail: { deltaY } }));
   }, []);
 
   return (
@@ -271,6 +296,7 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         highlights,
         addHighlight,
         removeHighlight,
+        updateHighlight,
         syncScrollDelta,
         triggerSyncScroll
       }}

@@ -3,7 +3,7 @@ import { useReader } from '../context/ReaderContext';
 import { TRANSLATIONS } from '../data/translations';
 import { findBookBySlug } from '../data/canon';
 import { useNavigate } from 'react-router-dom';
-import { X, Trash2, Columns, Sun, Moon } from 'lucide-react';
+import { X, Trash2, Columns, Sun, Moon, Pencil, Highlighter } from 'lucide-react';
 
 export const GearSheet: React.FC = () => {
   const {
@@ -190,10 +190,44 @@ export const GearSheet: React.FC = () => {
                       className="saved-phrase-item"
                       onClick={() => handleJumpToPhrase(hl)}
                     >
-                      <div className="saved-phrase-text">
-                        "{hl.text}"
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, minWidth: 0 }}>
+                        <span
+                          style={{
+                            width: '8px',
+                            height: '8px',
+                            borderRadius: '50%',
+                            flexShrink: 0,
+                            backgroundColor:
+                              hl.color === 'amber'
+                                ? 'var(--hl-amber-dot)'
+                                : hl.color === 'sage'
+                                ? 'var(--hl-sage-dot)'
+                                : hl.color === 'rose'
+                                ? 'var(--hl-rose-dot)'
+                                : hl.color === 'azure'
+                                ? 'var(--hl-azure-dot)'
+                                : 'var(--hl-monochrome-dot)'
+                          }}
+                        />
+                        {hl.style === 'highlighter' ? (
+                          <Highlighter size={12} style={{ opacity: 0.7, flexShrink: 0 }} />
+                        ) : hl.style === 'wavy' ? (
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.7, flexShrink: 0 }}>
+                            <path d="M2 9 Q5 5 8 9 T14 9" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                          </svg>
+                        ) : hl.style === 'double' ? (
+                          <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style={{ opacity: 0.7, flexShrink: 0 }}>
+                            <line x1="2" y1="5.5" x2="14" y2="5.5" stroke="currentColor" strokeWidth="1.6" />
+                            <line x1="2" y1="10.5" x2="14" y2="10.5" stroke="currentColor" strokeWidth="1.6" />
+                          </svg>
+                        ) : (
+                          <Pencil size={12} style={{ opacity: 0.7, flexShrink: 0 }} />
+                        )}
+                        <span className="saved-phrase-text" style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          "{hl.text}"
+                        </span>
                       </div>
-                      <div className="saved-phrase-ref">
+                      <div className="saved-phrase-ref" style={{ flexShrink: 0 }}>
                         {bookName} {hl.chapter}:{hl.verse} ({hl.translation.toUpperCase()})
                       </div>
                       <button

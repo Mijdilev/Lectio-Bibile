@@ -18,12 +18,16 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
   initialVerse = 1,
   isSplitView = false
 }) => {
-  const { setDockCollapsed, setPrimaryPlace, syncScrollDelta } = useReader();
+  const { setDockCollapsed, setPrimaryPlace, isSplit } = useReader();
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const lastScrollY = useRef<number>(0);
   const scrollHysteresis = useRef<number>(0);
+
+  // Master/follower flag: true when user is actively interacting with this pane
+  const isUserInteractingRef = useRef<boolean>(false);
+  const interactionTimerRef = useRef<number | null>(null);
 
   // Load chapter data on demand
   useEffect(() => {
@@ -59,35 +63,76 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
     }
   }, [loading, initialVerse]);
 
-  // Handle synchronized scroll delta from dock/drag tab
+  // Synchronized scroll listener from other triggers (e.g. comparison pane or dock)
   useEffect(() => {
-    if (syncScrollDelta !== 0 && containerRef.current) {
-      containerRef.current.scrollTop += syncScrollDelta;
-    }
-  }, [syncScrollDelta]);
+    const handleSync = (e: Event) => {
+      const custom = e as CustomEvent<{ deltaY: number; source?: string }>;
+      if (custom.detail?.source === 'primary') return;
+      if (containerRef.current && custom.detail?.deltaY) {
+        containerRef.current.scrollTop += custom.detail.deltaY;
+      }
+    };
+    window.addEventListener('lectio:sync-scroll', handleSync);
+    return () => window.removeEventListener('lectio:sync-scroll', handleSync);
+  }, []);
 
-  // Scroll listener: handles dock collapse/expand with hysteresis and visible verse detection
+  const startUserInteraction = () => {
+    isUserInteractingRef.current = true;
+    if (interactionTimerRef.current) clearTimeout(interactionTimerRef.current);
+  };
+
+  const endUserInteractionDebounced = () => {
+    if (interactionTimerRef.current) clearTimeout(interactionTimerRef.current);
+    interactionTimerRef.current = window.setTimeout(() => {
+      isUserInteractingRef.current = false;
+    }, 180);
+  };
+
+  // Helper to accurately locate the verse currently at the top reading line
+  const findTopVisibleVerse = (container: HTMLElement): number => {
+    const containerRect = container.getBoundingClientRect();
+    const readingLine = containerRect.top + 35; // reading threshold just below top edge
+
+    const verseElements = Array.from(container.querySelectorAll<HTMLElement>('[data-verse]'));
+    if (verseElements.length === 0) return 1;
+
+    for (const vEl of verseElements) {
+      const rect = vEl.getBoundingClientRect();
+      if (rect.bottom >= readingLine && rect.top <= readingLine + 40) {
+        return parseInt(vEl.dataset.verse || '1', 10);
+      }
+    }
+
+    for (const vEl of verseElements) {
+      const rect = vEl.getBoundingClientRect();
+      if (rect.bottom >= readingLine) {
+        return parseInt(vEl.dataset.verse || '1', 10);
+      }
+    }
+
+    return 1;
+  };
+
+  // Scroll listener: performs synchronized dual scrolling and updates top active verse
   const handleScroll = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
 
     const currentScrollY = el.scrollTop;
     const delta = currentScrollY - lastScrollY.current;
+    lastScrollY.current = currentScrollY;
 
-    // At top of chapter: dock always open
+    // Dock collapse hysteresis
     if (currentScrollY <= 20) {
       setDockCollapsed(false);
       scrollHysteresis.current = 0;
     } else {
-      // Hysteresis calculation (threshold 16px) to avoid flickering
       if (delta > 0) {
-        // Scrolling down (reading further)
         scrollHysteresis.current = Math.min(30, Math.max(0, scrollHysteresis.current + delta));
         if (scrollHysteresis.current > 16) {
           setDockCollapsed(true);
         }
       } else if (delta < 0) {
-        // Scrolling up (moving back)
         scrollHysteresis.current = Math.max(-30, Math.min(0, scrollHysteresis.current + delta));
         if (scrollHysteresis.current < -16) {
           setDockCollapsed(false);
@@ -95,34 +140,30 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
       }
     }
 
-    lastScrollY.current = currentScrollY;
-
-    // Find currently visible verse at the top reading line
-    const verseElements = el.querySelectorAll<HTMLElement>('[data-verse]');
-    const containerTop = el.getBoundingClientRect().top + 50; // top reading threshold
-
-    for (const vEl of Array.from(verseElements)) {
-      const rect = vEl.getBoundingClientRect();
-      if (rect.bottom >= containerTop && rect.top <= containerTop + 80) {
-        const vNum = parseInt(vEl.dataset.verse || '1', 10);
-        if (vNum > 0) {
-          setPrimaryPlace({
-            translation,
-            book: bookSlug,
-            chapter,
-            verse: vNum
-          });
-          break;
-        }
-      }
+    // Detect top visible verse and synchronize place
+    const topVerse = findTopVisibleVerse(el);
+    if (topVerse > 0) {
+      setPrimaryPlace({
+        translation,
+        book: bookSlug,
+        chapter,
+        verse: topVerse
+      });
     }
-  }, [bookSlug, chapter, setDockCollapsed, setPrimaryPlace, translation]);
+
+    endUserInteractionDebounced();
+  }, [bookSlug, chapter, isSplitView, setDockCollapsed, setPrimaryPlace, translation]);
 
   return (
     <div
       ref={containerRef}
       className={isSplitView ? 'pane-primary' : 'pane-single'}
       onScroll={handleScroll}
+      onTouchStart={startUserInteraction}
+      onTouchEnd={endUserInteractionDebounced}
+      onMouseDown={startUserInteraction}
+      onMouseUp={endUserInteractionDebounced}
+      onWheel={startUserInteraction}
       id="primary-reading-pane"
     >
       {loading ? (

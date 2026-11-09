@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useReader } from '../context/ReaderContext';
 import { loadChapter, ChapterData } from '../data/scriptureLoader';
 import { ScriptureBlocks } from './ScriptureBlocks';
@@ -17,21 +17,24 @@ export const ComparisonPane: React.FC<ComparisonPaneProps> = ({
   chapter,
   verse
 }) => {
-  const { setComparisonPlace, syncScrollDelta, primaryPlace } = useReader();
+  const { primaryPlace } = useReader();
   const [chapterData, setChapterData] = useState<ChapterData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Compute aligned chapter and verse
+  // Compute aligned chapter based on primary place
+  const primaryVerse = primaryPlace.verse || 1;
+  const primaryChap = primaryPlace.chapter || chapter;
+
   const alignedChapter = bookSlug === 'psalms'
-    ? mapPsalmReference(primaryPlace.translation, translation, chapter, verse).psalm
-    : chapter;
+    ? mapPsalmReference(primaryPlace.translation, translation, primaryChap, primaryVerse).psalm
+    : primaryChap;
 
   const alignedVerse = bookSlug === 'psalms'
-    ? mapPsalmReference(primaryPlace.translation, translation, chapter, verse).verse
-    : verse;
+    ? mapPsalmReference(primaryPlace.translation, translation, primaryChap, primaryVerse).verse
+    : primaryVerse;
 
-  // Load comparison chapter
+  // Load comparison chapter data
   useEffect(() => {
     let active = true;
     setLoading(true);
@@ -52,56 +55,29 @@ export const ComparisonPane: React.FC<ComparisonPaneProps> = ({
     };
   }, [translation, bookSlug, alignedChapter]);
 
-  // Align to verse on initial load or chapter change
+  // Initial alignment on chapter load
   useEffect(() => {
     if (!loading && alignedVerse) {
       const timer = setTimeout(() => {
+        const el = containerRef.current;
         const verseEl = document.getElementById(`verse-comparison-${alignedVerse}`);
-        if (verseEl && containerRef.current) {
-          verseEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (el && verseEl) {
+          const containerRect = el.getBoundingClientRect();
+          const verseRect = verseEl.getBoundingClientRect();
+          const diff = verseRect.top - containerRect.top - 16;
+          if (Math.abs(diff) > 2) {
+            el.scrollTop += diff;
+          }
         }
-      }, 150);
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [loading, alignedVerse]);
-
-  // Synchronized scroll from dock or side handle
-  useEffect(() => {
-    if (syncScrollDelta !== 0 && containerRef.current) {
-      containerRef.current.scrollTop += syncScrollDelta;
-    }
-  }, [syncScrollDelta]);
-
-  // Scroll listener for comparison pane: tracks its own visible verse for its pill
-  const handleScroll = useCallback(() => {
-    const el = containerRef.current;
-    if (!el) return;
-
-    const verseElements = el.querySelectorAll<HTMLElement>('[data-verse]');
-    const containerTop = el.getBoundingClientRect().top + 30;
-
-    for (const vEl of Array.from(verseElements)) {
-      const rect = vEl.getBoundingClientRect();
-      if (rect.bottom >= containerTop && rect.top <= containerTop + 60) {
-        const vNum = parseInt(vEl.dataset.verse || '1', 10);
-        if (vNum > 0) {
-          setComparisonPlace({
-            translation,
-            book: bookSlug,
-            chapter: alignedChapter,
-            verse: vNum
-          });
-          break;
-        }
-      }
-    }
-  }, [alignedChapter, bookSlug, setComparisonPlace, translation]);
 
   return (
     <div
       ref={containerRef}
       className="pane-comparison"
-      onScroll={handleScroll}
       id="comparison-reading-pane"
     >
       {loading ? (

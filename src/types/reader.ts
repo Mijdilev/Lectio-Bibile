@@ -7,6 +7,9 @@ export interface PlaceReference {
   verse: number;
 }
 
+export type HighlightStyle = 'pencil' | 'highlighter' | 'wavy' | 'double';
+export type HighlightColor = 'monochrome' | 'amber' | 'sage' | 'rose' | 'azure';
+
 export interface HighlightItem {
   id: string;
   translation: string;
@@ -17,6 +20,8 @@ export interface HighlightItem {
   endOffset: number;
   text: string;
   createdAt: number;
+  style?: HighlightStyle;
+  color?: HighlightColor;
 }
 
 export interface ReaderSettings {
