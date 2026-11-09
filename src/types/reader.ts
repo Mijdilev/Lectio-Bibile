@@ -30,3 +30,34 @@ export interface ReaderSettings {
   theme: ThemeMode;
   fontScale: number; // e.g. 100, 115, 130
 }
+
+export interface PlanReadingRef {
+  book: string;
+  chapter: number;
+  display: string;
+}
+
+export interface PlanDay {
+  day: number;
+  title: string;
+  focus?: string;
+  readings: PlanReadingRef[];
+  completed?: boolean;
+}
+
+export interface ReadingPlan {
+  id: string;
+  title: string;
+  description: string;
+  durationDays: number;
+  createdAt: number;
+  days: PlanDay[];
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'model';
+  text: string;
+  timestamp: number;
+  planProposal?: ReadingPlan;
+}

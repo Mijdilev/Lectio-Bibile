@@ -7,6 +7,8 @@ import { SplitDivider } from './SplitDivider';
 import { BottomDock } from './BottomDock';
 import { BookSheet } from './BookSheet';
 import { GearSheet } from './GearSheet';
+import { PlansSheet } from './PlansSheet';
+import { ChatSheet } from './ChatSheet';
 import { findBookBySlug } from '../data/canon';
 import { mapPsalmReference } from '../data/psalmsMapping';
 
@@ -280,6 +282,8 @@ export const ReadingScreen: React.FC = () => {
         <BookSheet target="primary" />
         <BookSheet target="comparison" />
         <GearSheet />
+        <PlansSheet />
+        <ChatSheet />
       </div>
     </div>
   );

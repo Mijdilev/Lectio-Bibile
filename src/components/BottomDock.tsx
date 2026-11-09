@@ -2,7 +2,7 @@ import React, { useRef } from 'react';
 import { useReader } from '../context/ReaderContext';
 import { findBookBySlug } from '../data/canon';
 import { getTranslation } from '../data/translations';
-import { Settings, Columns2 } from 'lucide-react';
+import { Settings, Columns2, Calendar, Sparkles } from 'lucide-react';
 
 export const BottomDock: React.FC = () => {
   const {
@@ -108,7 +108,33 @@ export const BottomDock: React.FC = () => {
 
           {!dockCollapsed && (
             <div className="dock-pill-actions">
-              {/* Split Screen button placed right in the dock near the settings gear symbol */}
+              {/* Reading Plans section */}
+              <button
+                className="dock-pill-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  setActiveSheet('plans');
+                }}
+                title="Reading Plans"
+                aria-label="Reading Plans"
+              >
+                <Calendar size={16} strokeWidth={2} />
+              </button>
+
+              {/* Gemini Chatbot & Plan Architect */}
+              <button
+                className="dock-pill-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  setActiveSheet('chat');
+                }}
+                title="Lectio Guide (Gemini)"
+                aria-label="Lectio Guide (Gemini)"
+              >
+                <Sparkles size={16} strokeWidth={2} />
+              </button>
+
+              {/* Split Screen button */}
               <button
                 className="dock-pill-btn"
                 onClick={e => {
@@ -118,9 +144,10 @@ export const BottomDock: React.FC = () => {
                 title="Open Split View"
                 aria-label="Open Split View"
               >
-                <Columns2 size={17} strokeWidth={2} />
+                <Columns2 size={16} strokeWidth={2} />
               </button>
 
+              {/* Settings button */}
               <button
                 className="dock-pill-btn"
                 onClick={e => {
@@ -130,7 +157,7 @@ export const BottomDock: React.FC = () => {
                 title="Settings"
                 aria-label="Settings"
               >
-                <Settings size={17} strokeWidth={2} />
+                <Settings size={16} strokeWidth={2} />
               </button>
             </div>
           )}
@@ -138,7 +165,7 @@ export const BottomDock: React.FC = () => {
       ) : (
         // Two Pills (Matching Sketch 3 - Landscape/Split view)
         <>
-          {/* Primary Pill: J 3:16 ENG + Split Toggle + Gear */}
+          {/* Primary Pill: J 3:16 ENG + Plans + Gemini + Split Toggle + Gear */}
           <div
             className="dock-pill dock-pill-split"
             onClick={() => handlePillClick('primary')}
@@ -150,8 +177,31 @@ export const BottomDock: React.FC = () => {
               <span className="dock-pill-lang-badge">{primaryTransMeta.pillCode}</span>
             </div>
 
-            <div className="dock-pill-actions" style={{ marginLeft: '0.4rem', gap: '2px' }}>
-              {/* Split screen toggle near gear icon to close split view */}
+            <div className="dock-pill-actions" style={{ marginLeft: '0.35rem', gap: '2px' }}>
+              <button
+                className="dock-pill-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  setActiveSheet('plans');
+                }}
+                title="Reading Plans"
+                aria-label="Reading Plans"
+              >
+                <Calendar size={14} strokeWidth={2} />
+              </button>
+
+              <button
+                className="dock-pill-btn"
+                onClick={e => {
+                  e.stopPropagation();
+                  setActiveSheet('chat');
+                }}
+                title="Lectio Guide (Gemini)"
+                aria-label="Lectio Guide (Gemini)"
+              >
+                <Sparkles size={14} strokeWidth={2} />
+              </button>
+
               <button
                 className="dock-pill-btn active"
                 onClick={e => {
@@ -161,7 +211,7 @@ export const BottomDock: React.FC = () => {
                 title="Close Split View"
                 aria-label="Close Split View"
               >
-                <Columns2 size={15} strokeWidth={2} />
+                <Columns2 size={14} strokeWidth={2} />
               </button>
 
               <button
@@ -173,7 +223,7 @@ export const BottomDock: React.FC = () => {
                 title="Settings"
                 aria-label="Settings"
               >
-                <Settings size={15} strokeWidth={2} />
+                <Settings size={14} strokeWidth={2} />
               </button>
             </div>
           </div>
