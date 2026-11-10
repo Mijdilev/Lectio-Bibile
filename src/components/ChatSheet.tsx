@@ -93,7 +93,16 @@ export const ChatSheet: React.FC = () => {
         text: m.text
       }));
 
-      const res = await fetch('/api/chat', {
+      // Route to cloud server if running from a local file/capacitor origin
+      const apiEndpoint =
+        typeof window !== 'undefined' &&
+        (window.location.protocol === 'file:' ||
+          window.location.origin.includes('capacitor://') ||
+          window.location.origin.includes('ionic://'))
+          ? `https://ais-pre-wgag4l5mwvdbn7bcbydrn3-538620317953.europe-west2.run.app/api/chat`
+          : '/api/chat';
+
+      const res = await fetch(apiEndpoint, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: historyPayload })

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Lectio</string>
+    <string name="title_activity_main">Lectio</string>
+    <string name="package_name">com.lectio.reader</string>
+    <string name="custom_url_scheme">com.lectio.reader</string>
+</resources>

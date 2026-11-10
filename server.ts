@@ -14,9 +14,35 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 
+// Enable CORS for external tools (e.g. PWABuilder, manifest checkers)
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    res.sendStatus(200);
+    return;
+  }
+  next();
+});
+
+// Explicitly serve public assets with CORS headers
+app.use(express.static(path.resolve(__dirname, 'public'), {
+  setHeaders: (res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+  }
+}));
+
 // Server-side initialization of Gemini client
+const getApiKey = () =>
+  process.env.GEMINI_API_KEY ||
+  process.env.API_KEY ||
+  process.env.GOOGLE_API_KEY ||
+  process.env.GOOGLE_GENAI_API_KEY ||
+  '';
+
 const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY,
+  apiKey: getApiKey(),
   httpOptions: {
     headers: {
       'User-Agent': 'aistudio-build',
@@ -61,25 +87,51 @@ app.post('/api/chat', async (req: Request, res: Response) => {
       return;
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    const key = getApiKey();
+    if (!key) {
       res.status(500).json({
         error: 'GEMINI_API_KEY is not configured in the server environment.',
       });
       return;
     }
 
+    const client = new GoogleGenAI({
+      apiKey: key,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+
     const contents = messages.map(m => ({
       role: m.role === 'model' ? 'model' : 'user',
       parts: [{ text: m.text }],
     }));
 
-    const response = await ai.models.generateContent({
-      model: 'gemini-3.8-flash',
-      contents,
-      config: {
-        systemInstruction: SYSTEM_INSTRUCTION,
-      },
-    });
+    let response;
+    try {
+      response = await client.models.generateContent({
+        model: 'gemini-3.8-flash',
+        contents,
+        config: {
+          systemInstruction: SYSTEM_INSTRUCTION,
+        },
+      });
+    } catch (err: any) {
+      if (err?.status === 503 || err?.message?.includes('503') || err?.message?.includes('high demand')) {
+        console.warn('gemini-3.8-flash 503 spike, falling back to gemini-3.1-flash-lite');
+        response = await client.models.generateContent({
+          model: 'gemini-3.1-flash-lite',
+          contents,
+          config: {
+            systemInstruction: SYSTEM_INSTRUCTION,
+          },
+        });
+      } else {
+        throw err;
+      }
+    }
 
     res.json({ text: response.text ?? '' });
   } catch (error: any) {
@@ -99,14 +151,24 @@ app.post('/api/plans/generate', async (req: Request, res: Response) => {
       return;
     }
 
-    if (!process.env.GEMINI_API_KEY) {
+    const key = getApiKey();
+    if (!key) {
       res.status(500).json({
         error: 'GEMINI_API_KEY is not configured in the server environment.',
       });
       return;
     }
 
-    const response = await ai.models.generateContent({
+    const client = new GoogleGenAI({
+      apiKey: key,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+
+    const response = await client.models.generateContent({
       model: 'gemini-3.8-flash',
       contents: `Create a structured Bible reading plan based on the following request: "${prompt}".
 Include all days with specific chapter readings and canonical book slugs.`,
