@@ -58,19 +58,6 @@ export const ReadingScreen: React.FC = () => {
     });
   }, [routeTrans, routeBook, routeChapter, effectiveTrans, effectiveBook, effectiveChapter, primaryTranslation, setPrimaryTranslation, setPrimaryPlace, navigate]);
 
-  // Current time for status bar simulation
-  const [timeStr, setTimeStr] = React.useState<string>('9:41');
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const h = now.getHours();
-      const m = now.getMinutes().toString().padStart(2, '0');
-      setTimeStr(`${h}:${m}`);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 60000);
-    return () => clearInterval(interval);
-  }, []);
 
   // Split-screen synchronized scrolling hook:
   // Detects split-screen mode, listens to scroll events in the primary pane,
@@ -204,15 +191,6 @@ export const ReadingScreen: React.FC = () => {
   return (
     <div className="lectio-root">
       <div className="lectio-frame">
-        {/* Status bar band: text runs through it, icons/text follow theme */}
-        <div className="status-bar-band">
-          <span>{timeStr}</span>
-          <div style={{ display: 'flex', gap: '5px', alignItems: 'center' }}>
-            <span style={{ fontSize: '0.65rem' }}>5G</span>
-            <span>100%</span>
-          </div>
-        </div>
-
         {/* Reading Viewport */}
         <div className="reading-viewport">
           {!isSplit ? (

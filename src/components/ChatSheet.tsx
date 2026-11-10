@@ -87,34 +87,77 @@ export const ChatSheet: React.FC = () => {
     setLoading(true);
 
     try {
-      // Send conversation history to server-side Gemini endpoint
+      // Send conversation history
       const historyPayload = [...chatMessages, userMsg].map(m => ({
         role: m.role,
         text: m.text
       }));
 
-      // Route to cloud server if running from a local file/capacitor origin
-      const apiEndpoint =
-        typeof window !== 'undefined' &&
-        (window.location.protocol === 'file:' ||
-          window.location.origin.includes('capacitor://') ||
-          window.location.origin.includes('ionic://'))
-          ? `https://ais-pre-wgag4l5mwvdbn7bcbydrn3-538620317953.europe-west2.run.app/api/chat`
-          : '/api/chat';
+      let modelText = '';
+      const clientApiKey = (import.meta as any).env?.VITE_GEMINI_API_KEY;
 
-      const res = await fetch(apiEndpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: historyPayload })
-      });
+      if (clientApiKey) {
+        // Direct call to Gemini REST API when compiled with client key (e.g. in mobile APK)
+        const geminiRes = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${clientApiKey}`,
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              system_instruction: {
+                parts: [
+                  {
+                    text:
+                      'You are Lectio Guide, a contemplative, scholarly biblical guide and reading curriculum architect inside the Lectio Bible Reader app. You help users understand scriptures, thematic connections, historical context, and create personalized reading plans.'
+                  }
+                ]
+              },
+              contents: historyPayload.map(m => ({
+                role: m.role === 'model' ? 'model' : 'user',
+                parts: [{ text: m.text }]
+              }))
+            })
+          }
+        );
 
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData.error || `Server responded with ${res.status}`);
+        if (!geminiRes.ok) {
+          const errData = await geminiRes.json().catch(() => ({}));
+          throw new Error(errData?.error?.message || `Gemini API returned ${geminiRes.status}`);
+        }
+
+        const data = await geminiRes.json();
+        modelText = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      } else {
+        // Route to local server endpoint
+        const res = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ messages: historyPayload })
+        });
+
+        const contentType = res.headers.get('content-type') || '';
+        const rawBody = await res.text();
+
+        // Detect if the server returned HTML (e.g., local 404/SPA index.html on mobile localhost or auth redirect)
+        if (!contentType.includes('application/json') || rawBody.trim().startsWith('<')) {
+          throw new Error(
+            'Standalone Android APK requires GEMINI_API_KEY set in your GitHub repository Secrets so the GitHub build can connect directly to Gemini.'
+          );
+        }
+
+        let data: any = {};
+        try {
+          data = JSON.parse(rawBody);
+        } catch {
+          throw new Error('Invalid response from server.');
+        }
+
+        if (!res.ok) {
+          throw new Error(data.error || `Server responded with ${res.status}`);
+        }
+
+        modelText = data.text || '';
       }
-
-      const data = await res.json();
-      const modelText = data.text || '';
 
       // Check for structured plan proposal in response
       const plan = extractPlanFromText(modelText);
