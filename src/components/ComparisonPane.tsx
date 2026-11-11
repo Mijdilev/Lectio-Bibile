@@ -55,9 +55,12 @@ export const ComparisonPane: React.FC<ComparisonPaneProps> = ({
     };
   }, [translation, bookSlug, alignedChapter]);
 
+  const scrolledChapterRef = useRef<number | null>(null);
+
   // Initial alignment on chapter load
   useEffect(() => {
-    if (!loading && alignedVerse) {
+    if (!loading && alignedVerse && scrolledChapterRef.current !== alignedChapter) {
+      scrolledChapterRef.current = alignedChapter;
       const timer = setTimeout(() => {
         const el = containerRef.current;
         const verseEl = document.getElementById(`verse-comparison-${alignedVerse}`);
@@ -72,7 +75,7 @@ export const ComparisonPane: React.FC<ComparisonPaneProps> = ({
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [loading, alignedVerse]);
+  }, [loading, alignedChapter, alignedVerse]);
 
   return (
     <div

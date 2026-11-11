@@ -83,6 +83,42 @@
   --hl-azure-dot: #38bdf8;
 }
 
+[data-theme='glass'] {
+  --bg: #080b13;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-subtle: #64748b;
+  --dock-bg: rgba(18, 23, 38, 0.72);
+  --dock-border: rgba(255, 255, 255, 0.18);
+  --dock-text: #ffffff;
+  --divider: rgba(255, 255, 255, 0.12);
+  --sheet-bg: rgba(13, 17, 28, 0.90);
+  --highlight-color: #f59e0b;
+  --highlighter-bg: rgba(245, 158, 11, 0.35);
+  --selection-bg: rgba(245, 158, 11, 0.22);
+
+  /* Color Palette - Liquid Glass with Amber Droplet Glow */
+  --hl-monochrome-stroke: #f1f5f9;
+  --hl-monochrome-fill: rgba(255, 255, 255, 0.16);
+  --hl-monochrome-dot: #f1f5f9;
+
+  --hl-amber-stroke: #f59e0b;
+  --hl-amber-fill: rgba(245, 158, 11, 0.35);
+  --hl-amber-dot: #f59e0b;
+
+  --hl-sage-stroke: #34d399;
+  --hl-sage-fill: rgba(52, 211, 153, 0.30);
+  --hl-sage-dot: #34d399;
+
+  --hl-rose-stroke: #fb7185;
+  --hl-rose-fill: rgba(251, 113, 133, 0.30);
+  --hl-rose-dot: #fb7185;
+
+  --hl-azure-stroke: #38bdf8;
+  --hl-azure-fill: rgba(56, 189, 248, 0.30);
+  --hl-azure-dot: #38bdf8;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -582,16 +618,26 @@ html, body, #root {
 /* Pill - Open State */
 .dock-pill-open {
   height: var(--dock-open-height);
-  padding: 0 0.95rem;
-  min-width: 160px;
+  padding: 0 1.15rem;
+  min-width: 230px;
+  max-width: calc(100% - 2rem);
 }
 
 /* Pill - Collapsed State (about half height, gear hidden) */
 .dock-pill-collapsed {
   height: var(--dock-collapsed-height);
-  padding: 0 0.8rem;
-  min-width: 110px;
+  padding: 0 0.85rem;
+  min-width: 120px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+/* Translucent dock while finger is actively scrolling */
+.bottom-dock-container.is-scrolling .dock-pill {
+  opacity: 0.22;
+  transform: scale(0.96);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  pointer-events: none;
 }
 
 .dock-pill-place {
@@ -1498,3 +1544,702 @@ html, body, #root {
   background: var(--divider);
   border-radius: 2px;
 }
+
+/* ==========================================================================
+   Tactile Upward-Expanding Dock Card (Replacing Settings Gear)
+   ========================================================================== */
+
+.dock-expanded-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  z-index: 40;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.bottom-dock-container.dock-container-expanded {
+  bottom: 0;
+  left: 0;
+  right: 0;
+  pointer-events: auto;
+  z-index: 45;
+}
+
+.dock-card-expanded {
+  width: 100%;
+  max-width: var(--phone-width);
+  background-color: var(--dock-bg);
+  color: var(--dock-text);
+  border: 1px solid var(--dock-border);
+  border-top-left-radius: 22px;
+  border-top-right-radius: 22px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  box-shadow: 0 -12px 36px rgba(0, 0, 0, 0.22);
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+  overflow: hidden;
+  max-height: 85dvh;
+  padding-bottom: max(1.2rem, var(--sab));
+}
+
+.dock-drag-bar-area {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.6rem 0 0.25rem 0;
+  cursor: pointer;
+}
+
+.dock-drag-bar {
+  width: 38px;
+  height: 4px;
+  border-radius: 2px;
+  background-color: var(--text-muted);
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+}
+
+.dock-drag-bar-area:hover .dock-drag-bar {
+  opacity: 0.7;
+}
+
+.dock-expanded-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 1.1rem 0.75rem 1.1rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.dock-expanded-place {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  color: var(--dock-text);
+}
+
+.dock-expanded-place:hover {
+  opacity: 0.8;
+}
+
+.dock-expanded-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dock-expanded-settings {
+  padding: 1rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+  overflow-y: auto;
+  max-height: calc(85dvh - 90px);
+}
+
+.dock-settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.dock-settings-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.dock-settings-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+}
+
+.dock-settings-group {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.dock-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid var(--divider);
+  background: transparent;
+  color: var(--dock-text);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.dock-toggle-btn.active {
+  background-color: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.dock-font-stepper {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  border: 1px solid var(--divider);
+  border-radius: 9999px;
+  padding: 2px 6px;
+}
+
+.dock-stepper-btn {
+  background: none;
+  border: none;
+  color: var(--dock-text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: background-color 0.12s ease;
+}
+
+.dock-stepper-btn:hover {
+  background-color: var(--divider);
+}
+
+.dock-font-val {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  font-weight: 600;
+  min-width: 38px;
+  text-align: center;
+}
+
+.dock-trans-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.45rem;
+}
+
+.dock-trans-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--divider);
+  background: transparent;
+  color: var(--dock-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.dock-trans-btn:hover {
+  border-color: var(--text-muted);
+}
+
+.dock-trans-btn.active {
+  background-color: var(--text);
+  color: var(--bg);
+  border-color: var(--text);
+}
+
+.dock-trans-name {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.dock-trans-desc {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  opacity: 0.75;
+  margin-top: 1px;
+}
+
+.dock-highlights-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.dock-highlight-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--divider);
+  cursor: pointer;
+  background-color: rgba(125, 125, 125, 0.05);
+  transition: background-color 0.15s ease;
+}
+
+.dock-highlight-item:hover {
+  background-color: rgba(125, 125, 125, 0.1);
+}
+
+.dock-hl-info {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  gap: 1px;
+}
+
+.dock-hl-ref {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.dock-hl-text {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 250px;
+}
+
+.dock-hl-delete {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: color 0.15s ease;
+}
+
+.dock-hl-delete:hover {
+  color: #ef4444;
+}
+
+.dock-expand-trigger {
+  animation: pulseSubtle 3s infinite;
+}
+
+@keyframes pulseSubtle {
+  0%, 100% { opacity: 0.85; }
+  50% { opacity: 1; transform: translateY(-1px); }
+}
+
+/* ==========================================================================
+   Side Notes & Marginalia (40% Screen Width Study Notes Drawer)
+   ========================================================================== */
+
+/* Discrete Edge Pull Tab (Swipe or Tap from right screen edge) */
+.side-notes-edge-tab {
+  position: absolute;
+  right: 0;
+  top: 40%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 48px;
+  background-color: var(--dock-bg);
+  color: var(--dock-text);
+  border: 1px solid var(--dock-border);
+  border-right: none;
+  border-top-left-radius: 10px;
+  border-bottom-left-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 25;
+  box-shadow: -2px 2px 8px rgba(0, 0, 0, 0.08);
+  opacity: 0.65;
+  transition: opacity 0.2s ease, width 0.15s ease;
+  touch-action: manipulation;
+}
+
+.side-notes-edge-tab:hover {
+  opacity: 1;
+  width: 24px;
+}
+
+.side-notes-backdrop {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(1.5px);
+  -webkit-backdrop-filter: blur(1.5px);
+  z-index: 55;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.side-notes-pane {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 40%;
+  min-width: 300px;
+  max-width: 480px;
+  background-color: var(--sheet-bg);
+  color: var(--text);
+  border-left: 1px solid var(--divider);
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -8px 0 24px rgba(0, 0, 0, 0.15);
+  animation: slideInRight 0.26s cubic-bezier(0.16, 1, 0.3, 1);
+  padding-top: max(0.75rem, var(--sat));
+  padding-bottom: max(1rem, var(--sab));
+}
+
+@media (max-width: 600px) {
+  .side-notes-pane {
+    width: 86%;
+    min-width: unset;
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.side-notes-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 1rem 0.75rem 1rem;
+  border-bottom: 1px solid var(--divider);
+}
+
+.side-notes-title-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.side-notes-icon {
+  color: var(--text-muted);
+}
+
+.side-notes-title {
+  font-family: var(--font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.side-notes-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.side-notes-btn {
+  background: none;
+  border: 1px solid var(--divider);
+  color: var(--text);
+  border-radius: 9999px;
+  padding: 3px 9px;
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.side-notes-btn:hover {
+  background-color: var(--divider);
+}
+
+.side-notes-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.15s ease;
+}
+
+.side-notes-close:hover {
+  color: var(--text);
+}
+
+.side-notes-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 1rem 0.5rem 1rem;
+  overflow: hidden;
+}
+
+.side-notes-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.6rem;
+}
+
+.side-notes-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.side-notes-tool-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  border: 1px solid var(--divider);
+  background: transparent;
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+
+.side-notes-tool-btn:hover:not(:disabled) {
+  background-color: var(--divider);
+}
+
+.side-notes-tool-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.side-notes-tool-danger:hover {
+  color: #ef4444;
+  border-color: #ef4444;
+}
+
+.side-notes-textarea {
+  flex: 1;
+  width: 100%;
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  line-height: 1.65;
+  padding: 0.4rem 0;
+  letter-spacing: -0.005em;
+}
+
+.side-notes-textarea::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-style: italic;
+  font-size: 0.88rem;
+}
+
+.side-notes-footer-hint {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  opacity: 0.65;
+  text-align: right;
+  padding-top: 0.4rem;
+}
+
+.side-notes-all-list {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.side-notes-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 60%;
+  text-align: center;
+  color: var(--text-muted);
+  gap: 0.4rem;
+}
+
+.side-notes-empty p {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.side-notes-empty span {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  max-width: 220px;
+  line-height: 1.4;
+  opacity: 0.8;
+}
+
+.side-notes-card {
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid var(--divider);
+  background-color: rgba(125, 125, 125, 0.05);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  transition: all 0.15s ease;
+}
+
+.side-notes-card:hover {
+  background-color: rgba(125, 125, 125, 0.1);
+  transform: translateY(-1px);
+}
+
+.side-notes-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.side-notes-card-title {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.side-notes-card-arrow {
+  color: var(--text-muted);
+}
+
+.side-notes-card-preview {
+  font-family: var(--font-serif);
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: var(--text);
+  opacity: 0.85;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.side-notes-card-date {
+  font-family: var(--font-sans);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ==========================================================================
+   Liquid Glass Theme Aesthetics
+   ========================================================================== */
+
+[data-theme='glass'] .lectio-root {
+  background: radial-gradient(circle at 50% 8%, rgba(245, 158, 11, 0.09) 0%, transparent 48%),
+              radial-gradient(circle at 85% 72%, rgba(56, 189, 248, 0.06) 0%, transparent 42%),
+              #080b13;
+}
+
+[data-theme='glass'] .lectio-frame {
+  background: transparent;
+}
+
+[data-theme='glass'] .dock-pill {
+  background: rgba(18, 23, 38, 0.68);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+}
+
+[data-theme='glass'] .dock-card-expanded {
+  background: rgba(13, 17, 28, 0.88);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 1px 0 rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+}
+
+[data-theme='glass'] .side-notes-pane {
+  background: rgba(13, 17, 28, 0.88);
+  border-left: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 0 rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+}
+
+[data-theme='glass'] .side-notes-edge-tab {
+  background: rgba(18, 23, 38, 0.75);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-right: none;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  box-shadow: -4px 4px 14px rgba(0, 0, 0, 0.35);
+}
+
+[data-theme='glass'] .sheet-card {
+  background: rgba(13, 17, 28, 0.90);
+  border-top: 1px solid rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  box-shadow: 0 -16px 40px rgba(0, 0, 0, 0.55), inset 0 1px 1px 0 rgba(255, 255, 255, 0.22);
+}
+
+[data-theme='glass'] .verse-num {
+  color: #f59e0b;
+  opacity: 0.8;
+}
+
+[data-theme='glass'] .dock-toggle-btn.active,
+[data-theme='glass'] .gear-toggle-btn.active {
+  background: rgba(245, 158, 11, 0.22);
+  color: #fef3c7;
+  border-color: rgba(245, 158, 11, 0.6);
+  box-shadow: 0 0 16px rgba(245, 158, 11, 0.25);
+}
+
+[data-theme='glass'] .dock-trans-btn.active {
+  background: rgba(245, 158, 11, 0.22);
+  color: #ffffff;
+  border-color: rgba(245, 158, 11, 0.6);
+}
+
+[data-theme='glass'] .chat-bubble.model-bubble {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='glass'] .chat-bubble.user-bubble {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  color: #0b0f19;
+  font-weight: 500;
+}
+
+

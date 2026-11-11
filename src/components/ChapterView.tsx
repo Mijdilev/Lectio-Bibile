@@ -29,6 +29,10 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
   const isUserInteractingRef = useRef<boolean>(false);
   const interactionTimerRef = useRef<number | null>(null);
 
+  const scrolledTargetRef = useRef<string | null>(null);
+  const scrollTimeoutRef = useRef<number | null>(null);
+  const verseUpdateTimeoutRef = useRef<number | null>(null);
+
   // Load chapter data on demand
   useEffect(() => {
     let active = true;
@@ -50,18 +54,23 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
     };
   }, [translation, bookSlug, chapter]);
 
-  // Handle initial verse scrolling
+  // Handle initial verse scrolling: ONLY once upon distinct chapter/verse target navigation
+  const targetKey = `${translation}:${bookSlug}:${chapter}:${initialVerse}`;
   useEffect(() => {
-    if (!loading && initialVerse > 1) {
+    if (!loading && initialVerse > 1 && scrolledTargetRef.current !== targetKey) {
+      scrolledTargetRef.current = targetKey;
       const timer = setTimeout(() => {
-        const verseEl = document.getElementById(`verse-primary-${initialVerse}`);
-        if (verseEl && containerRef.current) {
-          verseEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // Only scroll if user is not currently touching / actively scrolling
+        if (!isUserInteractingRef.current) {
+          const verseEl = document.getElementById(`verse-primary-${initialVerse}`);
+          if (verseEl && containerRef.current) {
+            verseEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }
         }
-      }, 150);
+      }, 120);
       return () => clearTimeout(timer);
     }
-  }, [loading, initialVerse]);
+  }, [loading, targetKey, initialVerse]);
 
   // Synchronized scroll listener from other triggers (e.g. comparison pane or dock)
   useEffect(() => {
@@ -85,7 +94,7 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
     if (interactionTimerRef.current) clearTimeout(interactionTimerRef.current);
     interactionTimerRef.current = window.setTimeout(() => {
       isUserInteractingRef.current = false;
-    }, 180);
+    }, 200);
   };
 
   // Helper to accurately locate the verse currently at the top reading line
@@ -113,10 +122,21 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
     return 1;
   };
 
-  // Scroll listener: performs synchronized dual scrolling and updates top active verse
+  // Broadcast scrolling activity for dock transparency
+  const notifyScrolling = () => {
+    window.dispatchEvent(new CustomEvent('lucent:scrolling', { detail: { isScrolling: true } }));
+    if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+    scrollTimeoutRef.current = window.setTimeout(() => {
+      window.dispatchEvent(new CustomEvent('lucent:scrolling', { detail: { isScrolling: false } }));
+    }, 280);
+  };
+
+  // Scroll listener: smooth natural momentum scrolling, dock collapse hysteresis, and debounced verse sync
   const handleScroll = useCallback(() => {
     const el = containerRef.current;
     if (!el) return;
+
+    notifyScrolling();
 
     const currentScrollY = el.scrollTop;
     const delta = currentScrollY - lastScrollY.current;
@@ -140,16 +160,21 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
       }
     }
 
-    // Detect top visible verse and synchronize place
-    const topVerse = findTopVisibleVerse(el);
-    if (topVerse > 0) {
-      setPrimaryPlace({
-        translation,
-        book: bookSlug,
-        chapter,
-        verse: topVerse
-      });
-    }
+    // Debounce top visible verse detection so rapid finger scrolling does not trigger React re-renders
+    if (verseUpdateTimeoutRef.current) clearTimeout(verseUpdateTimeoutRef.current);
+    verseUpdateTimeoutRef.current = window.setTimeout(() => {
+      if (containerRef.current) {
+        const topVerse = findTopVisibleVerse(containerRef.current);
+        if (topVerse > 0) {
+          setPrimaryPlace({
+            translation,
+            book: bookSlug,
+            chapter,
+            verse: topVerse
+          });
+        }
+      }
+    }, 200);
 
     endUserInteractionDebounced();
   }, [bookSlug, chapter, isSplitView, setDockCollapsed, setPrimaryPlace, translation]);

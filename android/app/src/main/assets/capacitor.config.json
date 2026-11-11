@@ -1,6 +1,6 @@
 {
-	"appId": "com.lectio.reader",
-	"appName": "Lectio",
+	"appId": "com.lucent.reader",
+	"appName": "Lucent",
 	"webDir": "dist",
 	"server": {
 		"androidScheme": "https"

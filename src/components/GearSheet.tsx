@@ -3,7 +3,7 @@ import { useReader } from '../context/ReaderContext';
 import { TRANSLATIONS } from '../data/translations';
 import { findBookBySlug } from '../data/canon';
 import { useNavigate } from 'react-router-dom';
-import { X, Trash2, Columns, Sun, Moon, Pencil, Highlighter } from 'lucide-react';
+import { X, Trash2, Columns, Sun, Moon, Sparkles, Pencil, Highlighter } from 'lucide-react';
 
 export const GearSheet: React.FC = () => {
   const {
@@ -88,6 +88,13 @@ export const GearSheet: React.FC = () => {
               >
                 <Moon size={16} />
                 <span>AMOLED Black</span>
+              </button>
+              <button
+                className={`gear-toggle-btn ${theme === 'glass' ? 'active' : ''}`}
+                onClick={() => setTheme('glass')}
+              >
+                <Sparkles size={16} />
+                <span>Liquid Glass</span>
               </button>
             </div>
           </div>

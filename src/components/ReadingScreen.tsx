@@ -9,8 +9,10 @@ import { BookSheet } from './BookSheet';
 import { GearSheet } from './GearSheet';
 import { PlansSheet } from './PlansSheet';
 import { ChatSheet } from './ChatSheet';
+import { SideNotesPane } from './SideNotesPane';
 import { findBookBySlug } from '../data/canon';
 import { mapPsalmReference } from '../data/psalmsMapping';
+import { FileText } from 'lucide-react';
 
 export const ReadingScreen: React.FC = () => {
   const {
@@ -29,8 +31,33 @@ export const ReadingScreen: React.FC = () => {
     setComparisonPlace,
     comparisonTranslation,
     isSplit,
-    splitRatio
+    splitRatio,
+    isNotesOpen,
+    setIsNotesOpen
   } = useReader();
+
+  const edgeTouchStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const handleGlobalTouchStart = (e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch.clientX > window.innerWidth - 65) {
+      edgeTouchStartRef.current = { x: touch.clientX, y: touch.clientY };
+    } else {
+      edgeTouchStartRef.current = null;
+    }
+  };
+
+  const handleGlobalTouchEnd = (e: React.TouchEvent) => {
+    if (!edgeTouchStartRef.current) return;
+    const touch = e.changedTouches[0];
+    const deltaX = touch.clientX - edgeTouchStartRef.current.x;
+    const deltaY = Math.abs(touch.clientY - edgeTouchStartRef.current.y);
+
+    if (deltaX < -35 && deltaY < 80) {
+      setIsNotesOpen(true);
+    }
+    edgeTouchStartRef.current = null;
+  };
 
   const splitWrapperRef = useRef<HTMLDivElement>(null);
   const lastSyncedVerseRef = useRef<number | null>(null);
@@ -189,8 +216,24 @@ export const ReadingScreen: React.FC = () => {
   ]);
 
   return (
-    <div className="lectio-root">
+    <div
+      className="lectio-root"
+      onTouchStart={handleGlobalTouchStart}
+      onTouchEnd={handleGlobalTouchEnd}
+    >
       <div className="lectio-frame">
+        {/* Discrete edge pull tab on the right side */}
+        {!isNotesOpen && (
+          <button
+            className="side-notes-edge-tab"
+            onClick={() => setIsNotesOpen(true)}
+            title="Swipe left or tap for Study Notes"
+            aria-label="Open Study Notes"
+          >
+            <FileText size={13} strokeWidth={2.2} />
+          </button>
+        )}
+
         {/* Reading Viewport */}
         <div className="reading-viewport">
           {!isSplit ? (
@@ -255,6 +298,9 @@ export const ReadingScreen: React.FC = () => {
 
         {/* Floating Bottom Dock */}
         <BottomDock />
+
+        {/* Side Notes & Marginalia Drawer */}
+        <SideNotesPane />
 
         {/* Modal Sheets */}
         <BookSheet target="primary" />

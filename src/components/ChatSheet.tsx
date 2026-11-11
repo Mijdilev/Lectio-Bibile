@@ -99,7 +99,7 @@ export const ChatSheet: React.FC = () => {
       if (clientApiKey) {
         // Direct call to Gemini REST API when compiled with client key (e.g. in mobile APK)
         const geminiRes = await fetch(
-          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${clientApiKey}`,
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${clientApiKey}`,
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -108,7 +108,7 @@ export const ChatSheet: React.FC = () => {
                 parts: [
                   {
                     text:
-                      'You are Lectio Guide, a contemplative, scholarly biblical guide and reading curriculum architect inside the Lectio Bible Reader app. You help users understand scriptures, thematic connections, historical context, and create personalized reading plans.'
+                      'You are Lucent Guide, a contemplative, scholarly biblical guide and reading curriculum architect inside the Lucent Bible Reader app. You help users understand scriptures, thematic connections, historical context, and create personalized reading plans.'
                   }
                 ]
               },
@@ -204,7 +204,7 @@ export const ChatSheet: React.FC = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Sparkles size={18} />
             <div>
-              <div className="sheet-title">Lectio Guide</div>
+              <div className="sheet-title">Lucent Guide</div>
               <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontFamily: 'var(--font-sans)' }}>
                 Powered by Gemini 3.8 Flash
               </div>

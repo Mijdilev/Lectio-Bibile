@@ -175,3 +175,15 @@ export function mapPsalmReference(
 
   return { psalm, verse };
 }
+
+/**
+ * Direct chapter-level mapping between Russian Synodal and English/Masoretic Psalms
+ */
+export function russianToEnglishPsalm(ruPsalm: number): number {
+  return septuagintToMasoretic(ruPsalm, 1).psalm;
+}
+
+export function englishToRussianPsalm(enPsalm: number): number {
+  return masoreticToSeptuagint(enPsalm, 1).psalm;
+}
+

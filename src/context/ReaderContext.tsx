@@ -60,6 +60,20 @@ interface ReaderContextType {
   // Synchronized scroll trigger
   syncScrollDelta: number;
   triggerSyncScroll: (deltaY: number) => void;
+
+  // Dock Expansion (Bottom card with embedded settings)
+  isDockExpanded: boolean;
+  setIsDockExpanded: (expanded: boolean) => void;
+  toggleDockExpanded: () => void;
+
+  // Side Notes / Marginalia
+  isNotesOpen: boolean;
+  setIsNotesOpen: (open: boolean) => void;
+  toggleNotes: () => void;
+  notes: Record<string, { text: string; updatedAt: number }>;
+  saveNote: (book: string, chapter: number, text: string) => void;
+  getNote: (book: string, chapter: number) => string;
+  deleteNote: (book: string, chapter: number) => void;
 }
 
 const STORAGE_KEYS = {
@@ -71,7 +85,8 @@ const STORAGE_KEYS = {
   SPLIT_RATIO: 'lectio_split_ratio',
   PLANS: 'lectio_plans',
   ACTIVE_PLAN_ID: 'lectio_active_plan_id',
-  CHAT: 'lectio_chat_history'
+  CHAT: 'lectio_chat_history',
+  NOTES: 'lectio_notes'
 };
 
 const ReaderContext = createContext<ReaderContextType | undefined>(undefined);
@@ -205,6 +220,58 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   });
 
   const [syncScrollDelta, setSyncScrollDelta] = useState<number>(0);
+
+  // Bottom dock expansion state (replaces modal settings gear with expanding vertical card)
+  const [isDockExpanded, setIsDockExpanded] = useState<boolean>(false);
+
+  // Side Notes drawer state & persistence
+  const [isNotesOpen, setIsNotesOpen] = useState<boolean>(false);
+  const [notes, setNotes] = useState<Record<string, { text: string; updatedAt: number }>>(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEYS.NOTES);
+      if (saved) return JSON.parse(saved);
+    } catch {}
+    return {};
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEYS.NOTES, JSON.stringify(notes));
+    } catch {}
+  }, [notes]);
+
+  const toggleDockExpanded = useCallback(() => {
+    setIsDockExpanded(prev => !prev);
+  }, []);
+
+  const toggleNotes = useCallback(() => {
+    setIsNotesOpen(prev => !prev);
+  }, []);
+
+  const saveNote = useCallback((book: string, chapter: number, text: string) => {
+    const key = `${book.toLowerCase()}_${chapter}`;
+    setNotes(prev => ({
+      ...prev,
+      [key]: {
+        text,
+        updatedAt: Date.now()
+      }
+    }));
+  }, []);
+
+  const getNote = useCallback((book: string, chapter: number) => {
+    const key = `${book.toLowerCase()}_${chapter}`;
+    return notes[key]?.text || '';
+  }, [notes]);
+
+  const deleteNote = useCallback((book: string, chapter: number) => {
+    const key = `${book.toLowerCase()}_${chapter}`;
+    setNotes(prev => {
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }, []);
 
   // Sync settings to localStorage and document element
   useEffect(() => {
@@ -457,7 +524,17 @@ export const ReaderProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         addChatMessage,
         clearChat,
         syncScrollDelta,
-        triggerSyncScroll
+        triggerSyncScroll,
+        isDockExpanded,
+        setIsDockExpanded,
+        toggleDockExpanded,
+        isNotesOpen,
+        setIsNotesOpen,
+        toggleNotes,
+        notes,
+        saveNote,
+        getNote,
+        deleteNote
       }}
     >
       {children}

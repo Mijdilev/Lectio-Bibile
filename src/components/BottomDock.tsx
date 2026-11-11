@@ -1,8 +1,19 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { useReader } from '../context/ReaderContext';
 import { findBookBySlug } from '../data/canon';
-import { getTranslation } from '../data/translations';
-import { Settings, Columns2, Calendar, Sparkles } from 'lucide-react';
+import { TRANSLATIONS, getTranslation } from '../data/translations';
+import {
+  Columns2,
+  Calendar,
+  Sparkles,
+  FileText,
+  ChevronUp,
+  ChevronDown,
+  Sun,
+  Moon,
+  Trash2
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const BottomDock: React.FC = () => {
   const {
@@ -11,14 +22,41 @@ export const BottomDock: React.FC = () => {
     dockCollapsed,
     setDockCollapsed,
     primaryPlace,
+    setPrimaryPlace,
     comparisonPlace,
     setActiveSheet,
-    triggerSyncScroll
+    triggerSyncScroll,
+    isDockExpanded,
+    setIsDockExpanded,
+    toggleDockExpanded,
+    isNotesOpen,
+    toggleNotes,
+    theme,
+    setTheme,
+    fontScale,
+    setFontScale,
+    primaryTranslation,
+    setPrimaryTranslation,
+    comparisonTranslation,
+    setComparisonTranslation,
+    highlights,
+    removeHighlight
   } = useReader();
 
-  const dockDragStartY = useRef<number | null>(null);
-  const rafId = useRef<number | null>(null);
-  const pendingDelta = useRef<number>(0);
+  const navigate = useNavigate();
+  const touchStartY = useRef<number | null>(null);
+  const touchStartTime = useRef<number>(0);
+  const [isScrolling, setIsScrolling] = useState<boolean>(false);
+
+  // Listen to scrolling state dispatched by reading panes
+  useEffect(() => {
+    const handleScrollEvent = (e: Event) => {
+      const custom = e as CustomEvent<{ isScrolling: boolean }>;
+      setIsScrolling(Boolean(custom.detail?.isScrolling));
+    };
+    window.addEventListener('lucent:scrolling', handleScrollEvent);
+    return () => window.removeEventListener('lucent:scrolling', handleScrollEvent);
+  }, []);
 
   // Format reference for single mode: e.g. "John 3:16"
   const getFormattedPlace = (place: typeof primaryPlace) => {
@@ -36,41 +74,30 @@ export const BottomDock: React.FC = () => {
     return `${shortCode} ${place.chapter}:${place.verse}`;
   };
 
-  // 90Hz/120Hz requestAnimationFrame batching for vertical dock drag
-  const applyPendingScroll = () => {
-    if (Math.abs(pendingDelta.current) > 0.5) {
-      triggerSyncScroll(pendingDelta.current);
-      pendingDelta.current = 0;
-    }
-    rafId.current = null;
+  // Gesture handling:
+  // Dragging UP when collapsed expands into vertical rectangle
+  // Dragging DOWN when expanded collapses back to dock pill
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartY.current = e.touches[0].clientY;
+    touchStartTime.current = Date.now();
   };
 
-  // Vertical drag on dock scrolls both panes together
-  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    dockDragStartY.current = clientY;
-  };
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (touchStartY.current === null) return;
+    const endY = e.changedTouches[0].clientY;
+    const deltaY = endY - touchStartY.current;
+    const duration = Date.now() - touchStartTime.current;
 
-  const handleTouchMove = (e: React.TouchEvent | React.MouseEvent) => {
-    if (dockDragStartY.current === null) return;
-    const clientY = 'touches' in e ? e.touches[0].clientY : e.clientY;
-    const deltaY = clientY - dockDragStartY.current;
-    if (Math.abs(deltaY) > 2) {
-      pendingDelta.current += deltaY * 1.5;
-      dockDragStartY.current = clientY;
-      if (!rafId.current) {
-        rafId.current = requestAnimationFrame(applyPendingScroll);
-      }
+    // Upward drag: deltaY negative
+    if (deltaY < -35 && !isDockExpanded) {
+      setIsDockExpanded(true);
     }
-  };
+    // Downward drag: deltaY positive
+    else if (deltaY > 35 && isDockExpanded) {
+      setIsDockExpanded(false);
+    }
 
-  const handleTouchEnd = () => {
-    dockDragStartY.current = null;
-    if (rafId.current) {
-      cancelAnimationFrame(rafId.current);
-      rafId.current = null;
-    }
-    applyPendingScroll();
+    touchStartY.current = null;
   };
 
   const handlePillClick = (target: 'primary' | 'comparison') => {
@@ -81,167 +108,422 @@ export const BottomDock: React.FC = () => {
     setActiveSheet(target === 'primary' ? 'book-primary' : 'book-comparison');
   };
 
+  const handleFontChange = (delta: number) => {
+    const next = Math.max(80, Math.min(150, fontScale + delta));
+    setFontScale(next);
+  };
+
+  const handleSelectPrimaryTrans = (id: string) => {
+    setPrimaryTranslation(id);
+    navigate(`/${id}/${primaryPlace.book}/${primaryPlace.chapter}`);
+  };
+
+  const handleJumpToPhrase = (hl: typeof highlights[0]) => {
+    setPrimaryPlace({
+      translation: hl.translation,
+      book: hl.book,
+      chapter: hl.chapter,
+      verse: hl.verse
+    });
+    setPrimaryTranslation(hl.translation);
+    setIsDockExpanded(false);
+    navigate(`/${hl.translation}/${hl.book}/${hl.chapter}`);
+    setTimeout(() => {
+      const el = document.getElementById(`verse-primary-${hl.verse}`);
+      el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }, 100);
+  };
+
   const primaryTransMeta = getTranslation(primaryPlace.translation);
   const comparisonTransMeta = getTranslation(comparisonPlace.translation);
 
   return (
-    <div
-      className="bottom-dock-container"
-      onTouchStart={handleTouchStart}
-      onTouchMove={handleTouchMove}
-      onTouchEnd={handleTouchEnd}
-      onMouseDown={handleTouchStart}
-      onMouseMove={handleTouchMove}
-      onMouseUp={handleTouchEnd}
-    >
-      {!isSplit ? (
-        // Single Reading Pill (Matching Sketch 1 & 2 with Split Button added near Gear)
+    <>
+      {/* Dimmed backdrop when dock is expanded into vertical settings card */}
+      {isDockExpanded && (
         <div
-          className={`dock-pill ${dockCollapsed ? 'dock-pill-collapsed' : 'dock-pill-open'}`}
-          onClick={() => handlePillClick('primary')}
-          role="button"
-          aria-label={dockCollapsed ? 'Expand dock' : 'Open book selection'}
-        >
-          <div className="dock-pill-place">
-            {getFormattedPlace(primaryPlace)}
-          </div>
-
-          {!dockCollapsed && (
-            <div className="dock-pill-actions">
-              {/* Reading Plans section */}
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setActiveSheet('plans');
-                }}
-                title="Reading Plans"
-                aria-label="Reading Plans"
-              >
-                <Calendar size={16} strokeWidth={2} />
-              </button>
-
-              {/* Gemini Chatbot & Plan Architect */}
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setActiveSheet('chat');
-                }}
-                title="Lectio Guide (Gemini)"
-                aria-label="Lectio Guide (Gemini)"
-              >
-                <Sparkles size={16} strokeWidth={2} />
-              </button>
-
-              {/* Split Screen button */}
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsSplit(true);
-                }}
-                title="Open Split View"
-                aria-label="Open Split View"
-              >
-                <Columns2 size={16} strokeWidth={2} />
-              </button>
-
-              {/* Settings button */}
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setActiveSheet('gear');
-                }}
-                title="Settings"
-                aria-label="Settings"
-              >
-                <Settings size={16} strokeWidth={2} />
-              </button>
-            </div>
-          )}
-        </div>
-      ) : (
-        // Two Pills (Matching Sketch 3 - Landscape/Split view)
-        <>
-          {/* Primary Pill: J 3:16 ENG + Plans + Gemini + Split Toggle + Gear */}
-          <div
-            className="dock-pill dock-pill-split"
-            onClick={() => handlePillClick('primary')}
-            role="button"
-            aria-label="Primary pane book picker"
-          >
-            <div className="dock-pill-place">
-              {getShortPlace(primaryPlace)}
-              <span className="dock-pill-lang-badge">{primaryTransMeta.pillCode}</span>
-            </div>
-
-            <div className="dock-pill-actions" style={{ marginLeft: '0.35rem', gap: '2px' }}>
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setActiveSheet('plans');
-                }}
-                title="Reading Plans"
-                aria-label="Reading Plans"
-              >
-                <Calendar size={14} strokeWidth={2} />
-              </button>
-
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setActiveSheet('chat');
-                }}
-                title="Lectio Guide (Gemini)"
-                aria-label="Lectio Guide (Gemini)"
-              >
-                <Sparkles size={14} strokeWidth={2} />
-              </button>
-
-              <button
-                className="dock-pill-btn active"
-                onClick={e => {
-                  e.stopPropagation();
-                  setIsSplit(false);
-                }}
-                title="Close Split View"
-                aria-label="Close Split View"
-              >
-                <Columns2 size={14} strokeWidth={2} />
-              </button>
-
-              <button
-                className="dock-pill-btn"
-                onClick={e => {
-                  e.stopPropagation();
-                  setActiveSheet('gear');
-                }}
-                title="Settings"
-                aria-label="Settings"
-              >
-                <Settings size={14} strokeWidth={2} />
-              </button>
-            </div>
-          </div>
-
-          {/* Comparison Pill: J 3:16 FR */}
-          <div
-            className="dock-pill dock-pill-split"
-            onClick={() => handlePillClick('comparison')}
-            role="button"
-            aria-label="Comparison pane book picker"
-          >
-            <div className="dock-pill-place">
-              {getShortPlace(comparisonPlace)}
-              <span className="dock-pill-lang-badge">{comparisonTransMeta.pillCode}</span>
-            </div>
-          </div>
-        </>
+          className="dock-expanded-backdrop"
+          onClick={() => setIsDockExpanded(false)}
+        />
       )}
-    </div>
+
+      <div
+        className={`bottom-dock-container ${isDockExpanded ? 'dock-container-expanded' : ''} ${isScrolling && !isDockExpanded ? 'is-scrolling' : ''}`}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      >
+        {!isDockExpanded ? (
+          /* COLLAPSED FLOATING DOCK */
+          !isSplit ? (
+            <div
+              className={`dock-pill ${dockCollapsed ? 'dock-pill-collapsed' : 'dock-pill-open'}`}
+              onClick={() => handlePillClick('primary')}
+              role="button"
+              aria-label={dockCollapsed ? 'Expand dock' : 'Open book selection'}
+            >
+              <div className="dock-pill-place">
+                {getFormattedPlace(primaryPlace)}
+              </div>
+
+              {!dockCollapsed && (
+                <div className="dock-pill-actions">
+                  {/* Reading Plans */}
+                  <button
+                    className="dock-pill-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setActiveSheet('plans');
+                    }}
+                    title="Reading Plans"
+                    aria-label="Reading Plans"
+                  >
+                    <Calendar size={16} strokeWidth={2} />
+                  </button>
+
+                  {/* Gemini Chatbot */}
+                  <button
+                    className="dock-pill-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setActiveSheet('chat');
+                    }}
+                    title="Lucent Guide (Gemini)"
+                    aria-label="Lucent Guide (Gemini)"
+                  >
+                    <Sparkles size={16} strokeWidth={2} />
+                  </button>
+
+                  {/* Side Notes */}
+                  <button
+                    className={`dock-pill-btn ${isNotesOpen ? 'active' : ''}`}
+                    onClick={e => {
+                      e.stopPropagation();
+                      toggleNotes();
+                    }}
+                    title="Side Notes & Marginalia"
+                    aria-label="Side Notes & Marginalia"
+                  >
+                    <FileText size={16} strokeWidth={2} />
+                  </button>
+
+                  {/* Split Screen button */}
+                  <button
+                    className="dock-pill-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setIsSplit(true);
+                    }}
+                    title="Open Split View"
+                    aria-label="Open Split View"
+                  >
+                    <Columns2 size={16} strokeWidth={2} />
+                  </button>
+
+                  {/* Upward Expand to Settings Rectangle */}
+                  <button
+                    className="dock-pill-btn dock-expand-trigger"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setIsDockExpanded(true);
+                    }}
+                    title="Drag or tap to open settings"
+                    aria-label="Open Settings"
+                  >
+                    <ChevronUp size={16} strokeWidth={2.5} />
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            /* Split View Pills */
+            <>
+              <div
+                className="dock-pill dock-pill-split"
+                onClick={() => handlePillClick('primary')}
+                role="button"
+                aria-label="Primary pane book picker"
+              >
+                <div className="dock-pill-place">
+                  {getShortPlace(primaryPlace)}
+                  <span className="dock-pill-lang-badge">{primaryTransMeta.pillCode}</span>
+                </div>
+
+                <div className="dock-pill-actions" style={{ marginLeft: '0.35rem', gap: '3px' }}>
+                  <button
+                    className="dock-pill-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setActiveSheet('plans');
+                    }}
+                    title="Reading Plans"
+                    aria-label="Reading Plans"
+                  >
+                    <Calendar size={14} strokeWidth={2} />
+                  </button>
+
+                  <button
+                    className="dock-pill-btn"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setActiveSheet('chat');
+                    }}
+                    title="Lucent Guide (Gemini)"
+                    aria-label="Lucent Guide (Gemini)"
+                  >
+                    <Sparkles size={14} strokeWidth={2} />
+                  </button>
+
+                  <button
+                    className={`dock-pill-btn ${isNotesOpen ? 'active' : ''}`}
+                    onClick={e => {
+                      e.stopPropagation();
+                      toggleNotes();
+                    }}
+                    title="Side Notes & Marginalia"
+                    aria-label="Side Notes & Marginalia"
+                  >
+                    <FileText size={14} strokeWidth={2} />
+                  </button>
+
+                  <button
+                    className="dock-pill-btn active"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setIsSplit(false);
+                    }}
+                    title="Close Split View"
+                    aria-label="Close Split View"
+                  >
+                    <Columns2 size={14} strokeWidth={2} />
+                  </button>
+
+                  <button
+                    className="dock-pill-btn dock-expand-trigger"
+                    onClick={e => {
+                      e.stopPropagation();
+                      setIsDockExpanded(true);
+                    }}
+                    title="Drag or tap to open settings"
+                    aria-label="Open Settings"
+                  >
+                    <ChevronUp size={14} strokeWidth={2.5} />
+                  </button>
+                </div>
+              </div>
+
+              {/* Comparison Pill */}
+              <div
+                className="dock-pill dock-pill-split"
+                onClick={() => handlePillClick('comparison')}
+                role="button"
+                aria-label="Comparison pane book picker"
+              >
+                <div className="dock-pill-place">
+                  {getShortPlace(comparisonPlace)}
+                  <span className="dock-pill-lang-badge">{comparisonTransMeta.pillCode}</span>
+                </div>
+              </div>
+            </>
+          )
+        ) : (
+          /* EXPANDED VERTICAL RECTANGLE WITH ROUNDED CORNERS */
+          <div className="dock-card-expanded">
+            {/* Top drag handle indicator */}
+            <div
+              className="dock-drag-bar-area"
+              onClick={() => setIsDockExpanded(false)}
+              title="Drag down or tap to collapse dock"
+            >
+              <div className="dock-drag-bar" />
+            </div>
+
+            {/* TOP ROW: Basic Dock Content */}
+            <div className="dock-expanded-header">
+              <div
+                className="dock-expanded-place"
+                onClick={() => {
+                  setIsDockExpanded(false);
+                  setActiveSheet('book-primary');
+                }}
+                role="button"
+                title="Tap to change book or chapter"
+              >
+                <span>{getFormattedPlace(primaryPlace)}</span>
+                <span className="dock-pill-lang-badge">{primaryTransMeta.pillCode}</span>
+              </div>
+
+              <div className="dock-expanded-actions">
+                <button
+                  className="dock-pill-btn"
+                  onClick={() => {
+                    setIsDockExpanded(false);
+                    setActiveSheet('plans');
+                  }}
+                  title="Reading Plans"
+                >
+                  <Calendar size={16} strokeWidth={2} />
+                </button>
+
+                <button
+                  className="dock-pill-btn"
+                  onClick={() => {
+                    setIsDockExpanded(false);
+                    setActiveSheet('chat');
+                  }}
+                  title="Lucent Guide (Gemini)"
+                >
+                  <Sparkles size={16} strokeWidth={2} />
+                </button>
+
+                <button
+                  className={`dock-pill-btn ${isNotesOpen ? 'active' : ''}`}
+                  onClick={() => {
+                    toggleNotes();
+                  }}
+                  title="Side Notes"
+                >
+                  <FileText size={16} strokeWidth={2} />
+                </button>
+
+                <button
+                  className={`dock-pill-btn ${isSplit ? 'active' : ''}`}
+                  onClick={() => setIsSplit(!isSplit)}
+                  title={isSplit ? 'Close Split View' : 'Open Split View'}
+                >
+                  <Columns2 size={16} strokeWidth={2} />
+                </button>
+
+                <button
+                  className="dock-pill-btn"
+                  onClick={() => setIsDockExpanded(false)}
+                  title="Collapse Settings"
+                  aria-label="Collapse Settings"
+                >
+                  <ChevronDown size={18} strokeWidth={2.5} />
+                </button>
+              </div>
+            </div>
+
+            {/* EXPANDED SETTINGS CONTENT BELOW */}
+            <div className="dock-expanded-settings">
+              {/* Theme: Flat White & AMOLED Black */}
+              <div className="dock-settings-row">
+                <div className="dock-settings-label">Theme</div>
+                <div className="dock-settings-group">
+                  <button
+                    className={`dock-toggle-btn ${theme === 'white' ? 'active' : ''}`}
+                    onClick={() => setTheme('white')}
+                  >
+                    <Sun size={15} />
+                    <span>White</span>
+                  </button>
+                  <button
+                    className={`dock-toggle-btn ${theme === 'black' ? 'active' : ''}`}
+                    onClick={() => setTheme('black')}
+                  >
+                    <Moon size={15} />
+                    <span>AMOLED Black</span>
+                  </button>
+                  <button
+                    className={`dock-toggle-btn ${theme === 'glass' ? 'active' : ''}`}
+                    onClick={() => setTheme('glass')}
+                  >
+                    <Sparkles size={15} />
+                    <span>Liquid Glass</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Type Size Stepper */}
+              <div className="dock-settings-row">
+                <div className="dock-settings-label">Type Size</div>
+                <div className="dock-font-stepper">
+                  <button className="dock-stepper-btn" onClick={() => handleFontChange(-10)}>
+                    A−
+                  </button>
+                  <span className="dock-font-val">{fontScale}%</span>
+                  <button className="dock-stepper-btn" onClick={() => handleFontChange(10)}>
+                    A+
+                  </button>
+                </div>
+              </div>
+
+              {/* Primary Translation */}
+              <div className="dock-settings-col">
+                <div className="dock-settings-label">Primary Translation</div>
+                <div className="dock-trans-grid">
+                  {TRANSLATIONS.map(t => (
+                    <button
+                      key={t.id}
+                      className={`dock-trans-btn ${primaryTranslation === t.id ? 'active' : ''}`}
+                      onClick={() => handleSelectPrimaryTrans(t.id)}
+                    >
+                      <span className="dock-trans-name">{t.shortName}</span>
+                      <span className="dock-trans-desc">{t.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Comparison Translation (if Split Screen active) */}
+              {isSplit && (
+                <div className="dock-settings-col">
+                  <div className="dock-settings-label">Comparison Translation</div>
+                  <div className="dock-trans-grid">
+                    {TRANSLATIONS.map(t => (
+                      <button
+                        key={t.id}
+                        className={`dock-trans-btn ${comparisonTranslation === t.id ? 'active' : ''}`}
+                        onClick={() => setComparisonTranslation(t.id)}
+                      >
+                        <span className="dock-trans-name">{t.shortName}</span>
+                        <span className="dock-trans-desc">{t.name}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Saved Highlights */}
+              {highlights.length > 0 && (
+                <div className="dock-settings-col">
+                  <div className="dock-settings-label">Highlights ({highlights.length})</div>
+                  <div className="dock-highlights-list">
+                    {highlights.slice(0, 5).map(hl => {
+                      const b = findBookBySlug(hl.book);
+                      const bName = b?.name || hl.book;
+                      return (
+                        <div
+                          key={hl.id}
+                          className="dock-highlight-item"
+                          onClick={() => handleJumpToPhrase(hl)}
+                        >
+                          <div className="dock-hl-info">
+                            <span className="dock-hl-ref">
+                              {bName} {hl.chapter}:{hl.verse}
+                            </span>
+                            <span className="dock-hl-text">"{hl.text}"</span>
+                          </div>
+                          <button
+                            className="dock-hl-delete"
+                            onClick={e => {
+                              e.stopPropagation();
+                              removeHighlight(hl.id);
+                            }}
+                            title="Remove highlight"
+                          >
+                            <Trash2 size={13} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+    </>
   );
 };

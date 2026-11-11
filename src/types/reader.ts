@@ -1,4 +1,4 @@
-export type ThemeMode = 'white' | 'black';
+export type ThemeMode = 'white' | 'black' | 'glass';
 
 export interface PlaceReference {
   translation: string;
@@ -60,4 +60,12 @@ export interface ChatMessage {
   text: string;
   timestamp: number;
   planProposal?: ReadingPlan;
+}
+
+export interface ChapterNote {
+  id: string;
+  book: string;
+  chapter: number;
+  content: string;
+  updatedAt: number;
 }

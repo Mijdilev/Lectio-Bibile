@@ -1,5 +1,6 @@
 import { BookMeta, CANON, findBookBySlug } from './canon';
 import { getTranslation } from './translations';
+import { russianToEnglishPsalm } from './psalmsMapping';
 
 export interface VerseItem {
   n: number;
@@ -78,7 +79,7 @@ export async function loadChapter(
 
   // 2. Check localStorage cached chapter
   const normTrans = translation.toLowerCase();
-  const localCacheKey = `lectio_chapter_${normTrans}_${bookMeta.slug}_${chapter}`;
+  const localCacheKey = `lucent_chapter_v4_${normTrans}_${bookMeta.slug}_${chapter}`;
   try {
     const saved = localStorage.getItem(localCacheKey);
     if (saved) {
@@ -116,7 +117,7 @@ async function fetchRealChapter(
 ): Promise<ChapterData | null> {
   const normTrans = translation.toLowerCase();
   const isPoetry = meta.slug === 'psalms' || meta.slug === 'proverbs' || meta.slug === 'songofsolomon';
-  const localCacheKey = `lectio_chapter_${normTrans}_${meta.slug}_${chapter}`;
+  const localCacheKey = `lucent_chapter_v4_${normTrans}_${meta.slug}_${chapter}`;
 
   let verses: VerseItem[] = [];
 
@@ -142,30 +143,46 @@ async function fetchRealChapter(
       if (normTrans === 'web') apiTrans = 'web';
       if (normTrans === 'synodal') apiTrans = 'synodal';
 
-      // First attempt: direct USFM structured query (e.g. /data/kjv/MRK/4)
-      const res = await fetch(`https://bible-api.com/data/${apiTrans}/${meta.id}/${chapter}`);
+      // For Russian Synodal Psalms: bible-api.com indexes Synodal under English (Masoretic) Psalm numbers!
+      // Map the Russian Synodal Psalm number to the English Psalm number for the API query:
+      let queryChapter = chapter;
+      if (normTrans === 'synodal' && meta.slug === 'psalms') {
+        queryChapter = russianToEnglishPsalm(chapter);
+      }
+
+      // First attempt: direct USFM structured query (e.g. /data/synodal/PSA/145)
+      const res = await fetch(`https://bible-api.com/data/${apiTrans}/${meta.id}/${queryChapter}`);
       if (res.ok) {
         const data = await res.json();
         if (Array.isArray(data.verses) && data.verses.length > 0) {
-          verses = data.verses.map((v: any) => ({
-            n: Number(v.verse),
-            text: String(v.text || '').trim()
-          }));
+          verses = data.verses.map((v: any) => {
+            let text = String(v.text || '').trim();
+            // Remove "(143:1) " Septuagint prefix artifact embedded by bible-api.com
+            text = text.replace(/^\(\d+:\d+\)\s*/, '').trim();
+            return {
+              n: Number(v.verse),
+              text
+            };
+          });
         }
       }
 
       // Second attempt if USFM query returned nothing: English book name query
       if (verses.length === 0) {
         const fallbackRes = await fetch(
-          `https://bible-api.com/${encodeURIComponent(meta.name)}+${chapter}?translation=${apiTrans}`
+          `https://bible-api.com/${encodeURIComponent(meta.name)}+${queryChapter}?translation=${apiTrans}`
         );
         if (fallbackRes.ok) {
           const fbData = await fallbackRes.json();
           if (Array.isArray(fbData.verses) && fbData.verses.length > 0) {
-            verses = fbData.verses.map((v: any) => ({
-              n: Number(v.verse),
-              text: String(v.text || '').trim()
-            }));
+            verses = fbData.verses.map((v: any) => {
+              let text = String(v.text || '').trim();
+              text = text.replace(/^\(\d+:\d+\)\s*/, '').trim();
+              return {
+                n: Number(v.verse),
+                text
+              };
+            });
           }
         }
       }
