@@ -89,3 +89,37 @@ export function findBookBySlug(slug: string): BookMeta | undefined {
 export function findBookById(id: string): BookMeta | undefined {
   return CANON.find(b => b.id.toUpperCase() === id.toUpperCase());
 }
+
+export function getNextChapter(
+  bookSlug: string,
+  chapter: number
+): { bookSlug: string; chapter: number } | null {
+  const norm = bookSlug.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const idx = CANON.findIndex(b => b.slug === norm || b.id.toLowerCase() === norm);
+  if (idx === -1) return null;
+  const current = CANON[idx];
+  if (chapter < current.chapters) {
+    return { bookSlug: current.slug, chapter: chapter + 1 };
+  }
+  if (idx < CANON.length - 1) {
+    return { bookSlug: CANON[idx + 1].slug, chapter: 1 };
+  }
+  return null;
+}
+
+export function getPrevChapter(
+  bookSlug: string,
+  chapter: number
+): { bookSlug: string; chapter: number } | null {
+  const norm = bookSlug.toLowerCase().replace(/[^a-z0-9]/g, '');
+  const idx = CANON.findIndex(b => b.slug === norm || b.id.toLowerCase() === norm);
+  if (idx === -1) return null;
+  if (chapter > 1) {
+    return { bookSlug: CANON[idx].slug, chapter: chapter - 1 };
+  }
+  if (idx > 0) {
+    const prev = CANON[idx - 1];
+    return { bookSlug: prev.slug, chapter: prev.chapters };
+  }
+  return null;
+}

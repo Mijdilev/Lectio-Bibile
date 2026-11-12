@@ -1,6 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useReader } from '../context/ReaderContext';
-import { findBookBySlug } from '../data/canon';
+import { findBookBySlug, getNextChapter, getPrevChapter } from '../data/canon';
 import { TRANSLATIONS, getTranslation } from '../data/translations';
 import {
   Columns2,
@@ -45,8 +45,38 @@ export const BottomDock: React.FC = () => {
 
   const navigate = useNavigate();
   const touchStartY = useRef<number | null>(null);
+  const touchStartX = useRef<number | null>(null);
   const touchStartTime = useRef<number>(0);
   const [isScrolling, setIsScrolling] = useState<boolean>(false);
+  const [swipeHint, setSwipeHint] = useState<string | null>(null);
+  const swipeHintTimerRef = useRef<number | null>(null);
+
+  // Trigger chapter change across books with tactile toast
+  const triggerChapterChange = (direction: 'next' | 'prev') => {
+    const target =
+      direction === 'next'
+        ? getNextChapter(primaryPlace.book, primaryPlace.chapter)
+        : getPrevChapter(primaryPlace.book, primaryPlace.chapter);
+
+    if (target) {
+      const meta = findBookBySlug(target.bookSlug);
+      let name = meta?.name || target.bookSlug;
+      if (primaryPlace.translation === 'segond' && meta?.nameFr) name = meta.nameFr;
+      if (primaryPlace.translation === 'synodal' && meta?.nameRu) name = meta.nameRu;
+
+      const label = direction === 'next' ? `${name} ${target.chapter} →` : `← ${name} ${target.chapter}`;
+      setSwipeHint(label);
+      if (swipeHintTimerRef.current) clearTimeout(swipeHintTimerRef.current);
+      swipeHintTimerRef.current = window.setTimeout(() => setSwipeHint(null), 1200);
+
+      setPrimaryPlace({
+        book: target.bookSlug,
+        chapter: target.chapter,
+        verse: 1
+      });
+      navigate(`/${primaryPlace.translation}/${target.bookSlug}/${target.chapter}`);
+    }
+  };
 
   // Listen to scrolling state dispatched by reading panes
   useEffect(() => {
@@ -75,29 +105,48 @@ export const BottomDock: React.FC = () => {
   };
 
   // Gesture handling:
-  // Dragging UP when collapsed expands into vertical rectangle
-  // Dragging DOWN when expanded collapses back to dock pill
+  // - Dragging UP when collapsed expands settings
+  // - Swiping LEFT/RIGHT on dock moves between chapters
+  // - Dragging DOWN when expanded collapses back to dock pill
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartY.current = e.touches[0].clientY;
+    touchStartX.current = e.touches[0].clientX;
     touchStartTime.current = Date.now();
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
-    if (touchStartY.current === null) return;
+    if (touchStartY.current === null || touchStartX.current === null) return;
     const endY = e.changedTouches[0].clientY;
+    const endX = e.changedTouches[0].clientX;
     const deltaY = endY - touchStartY.current;
-    const duration = Date.now() - touchStartTime.current;
+    const deltaX = endX - touchStartX.current;
 
-    // Upward drag: deltaY negative
-    if (deltaY < -35 && !isDockExpanded) {
+    // If dock card is expanded: downward swipe collapses it
+    if (isDockExpanded) {
+      if (deltaY > 35) {
+        setIsDockExpanded(false);
+      }
+      touchStartY.current = null;
+      touchStartX.current = null;
+      return;
+    }
+
+    // When collapsed:
+    // 1. Upward drag: expands settings card
+    if (deltaY < -38 && Math.abs(deltaY) > Math.abs(deltaX) * 1.25) {
       setIsDockExpanded(true);
     }
-    // Downward drag: deltaY positive
-    else if (deltaY > 35 && isDockExpanded) {
-      setIsDockExpanded(false);
+    // 2. Horizontal swipe left: Next Chapter
+    else if (deltaX < -45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+      triggerChapterChange('next');
+    }
+    // 3. Horizontal swipe right: Previous Chapter
+    else if (deltaX > 45 && Math.abs(deltaX) > Math.abs(deltaY) * 1.1) {
+      triggerChapterChange('prev');
     }
 
     touchStartY.current = null;
+    touchStartX.current = null;
   };
 
   const handlePillClick = (target: 'primary' | 'comparison') => {
@@ -152,6 +201,11 @@ export const BottomDock: React.FC = () => {
         onTouchStart={handleTouchStart}
         onTouchEnd={handleTouchEnd}
       >
+        {swipeHint && (
+          <div className="chapter-swipe-hint-pill">
+            {swipeHint}
+          </div>
+        )}
         {!isDockExpanded ? (
           /* COLLAPSED FLOATING DOCK */
           !isSplit ? (

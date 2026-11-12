@@ -222,18 +222,6 @@ export const ReadingScreen: React.FC = () => {
       onTouchEnd={handleGlobalTouchEnd}
     >
       <div className="lectio-frame">
-        {/* Discrete edge pull tab on the right side */}
-        {!isNotesOpen && (
-          <button
-            className="side-notes-edge-tab"
-            onClick={() => setIsNotesOpen(true)}
-            title="Swipe left or tap for Study Notes"
-            aria-label="Open Study Notes"
-          >
-            <FileText size={13} strokeWidth={2.2} />
-          </button>
-        )}
-
         {/* Reading Viewport */}
         <div className="reading-viewport">
           {!isSplit ? (

@@ -97,13 +97,27 @@ export const ChapterView: React.FC<ChapterViewProps> = ({
     }, 200);
   };
 
-  // Helper to accurately locate the verse currently at the top reading line
+  // Helper to accurately locate the active verse (top reading line or ending verse when at bottom of chapter)
   const findTopVisibleVerse = (container: HTMLElement): number => {
-    const containerRect = container.getBoundingClientRect();
-    const readingLine = containerRect.top + 35; // reading threshold just below top edge
-
     const verseElements = Array.from(container.querySelectorAll<HTMLElement>('[data-verse]'));
     if (verseElements.length === 0) return 1;
+
+    const containerRect = container.getBoundingClientRect();
+
+    // If user has scrolled near or to the bottom of the chapter, align active verse to the ending verses
+    const isAtBottom = container.scrollTop + container.clientHeight >= container.scrollHeight - 65;
+    if (isAtBottom) {
+      for (let i = verseElements.length - 1; i >= 0; i--) {
+        const vEl = verseElements[i];
+        const rect = vEl.getBoundingClientRect();
+        if (rect.top <= containerRect.bottom - 20) {
+          return parseInt(vEl.dataset.verse || '1', 10);
+        }
+      }
+      return parseInt(verseElements[verseElements.length - 1].dataset.verse || '1', 10);
+    }
+
+    const readingLine = containerRect.top + 35; // reading threshold just below top edge
 
     for (const vEl of verseElements) {
       const rect = vEl.getBoundingClientRect();
